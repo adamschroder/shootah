@@ -9,9 +9,11 @@ concepts
 
 ideas from balcony sesh:
  - survival type? or survival/deathmatch?
+ - Number of enemies and map size scales to number of players
  - friendly fire
  - griefers become enemies
  - bounties (randomly?) put out on players
+ - pixel art
 
 technical issues
 ================
