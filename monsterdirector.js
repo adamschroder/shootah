@@ -46,7 +46,9 @@ module.exports = (function () {
       monster = {
         'type': 'monster',
         'x': board.height/2,
-        'y': board.width/2
+        'y': board.width/2,
+        'height': 100,
+        'width': 100
       };
 
       monster.id = monsters.push(monster);
