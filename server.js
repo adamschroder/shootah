@@ -132,6 +132,7 @@ function createUser (socket, data) {
     // remap old data
     userData = users[sessionIds[data.id]];
     userData.isDead = false;
+    userData.health = 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
   }
