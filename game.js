@@ -25,9 +25,6 @@ socket.emit('userJoined', userData);
 socket.on('join', function (data) {
 
   sessionId = socket.socket.sessionid;
-
-  console.log('join', sessionId);
-
   if (data.socketId === sessionId) {
 
     window.localStorage.setItem('user', JSON.stringify(data));
@@ -35,8 +32,6 @@ socket.on('join', function (data) {
   }
 
   users[data.id] = data;
-
-  // create the others on the board
 });
 
 
@@ -50,7 +45,6 @@ socket.on('move', function (data) {
 });
 
 // key events
-
 window.addEventListener('keydown', function (e) {
 
   keysDown[e.keyCode] = true;
@@ -62,7 +56,6 @@ window.addEventListener('keyup', function (e) {
 });
 
 // methods
-
 function update (mod) {
 
 
@@ -117,7 +110,7 @@ function render () {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (user in users) {
+  for (var user in users) {
 
     if (!users.hasOwnProperty(user)) {
 
