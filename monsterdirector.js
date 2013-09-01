@@ -87,9 +87,9 @@ module.exports = (function () {
       else {
         monster.y -= speed;
       }
-
-      self.emit('move', monster);
     }
+
+    self.emit('move', monsters);
   }
 
   function Monster () {
