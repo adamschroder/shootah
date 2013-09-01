@@ -62,7 +62,7 @@ socket.on('move', function (data) {
     updatePositions(data);
   }
   else {
-    updatePositions([data])
+    updatePositions([data]);
   }
 });
 
@@ -81,6 +81,21 @@ socket.on('killBullet', function (id) {
 socket.on('killedMonster', function (id) {
 
   monsters[id] && (delete monsters[id]);
+});
+
+socket.on('userDamaged', function (data) {
+
+  var user = users[data.id];
+  if (user) {
+    user.health = data.health;
+  }
+});
+
+socket.on('userDeath', function (id) {
+
+  var user = users[id];
+  user && delete users[id];
+  // todo animation of user death?
 });
 
 // key events
@@ -266,6 +281,7 @@ function updateBullet (b) {
     b.x += spd * mod;
   }
 
+  // only manage bullet collision for self
   if (b.owner === userId) {
 
     var isInbounds = isOnBoard(b);
@@ -279,6 +295,8 @@ function updateBullet (b) {
 
     var user = collidesWithUser(b);
     if (user) {
+      user.health -= 1;
+      (monster.health <= 0) && (delete users[user.id]);
       socket.emit('hitUser', {'id': user.id, 'damage': 1});
     }
     var monster = collidesWithMonster(b);
