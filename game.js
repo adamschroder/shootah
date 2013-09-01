@@ -10,10 +10,10 @@ canvas.height = 600;
 var sessionId, userData;
 var users = {};
 var monsters = [];
+var bullets = [];
 var keysDown = {};
 
 try {
-
   userData = JSON.parse(window.localStorage.getItem('user'));
 }
 catch (e){}
@@ -84,6 +84,13 @@ function update (mod) {
    userData.y += offset;
    socket.emit('updateMovement', userData);
   }
+
+  // space
+  if (32 in keysDown) {
+
+    var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
+    console.log(bullet);
+  }
 }
 
 
@@ -107,6 +114,14 @@ function checkBounds () {
   return true;
 }
 
+function Bullet (x, y, direction, owner) {
+
+  this.owner = owner;
+  this.x = x;
+  this.y = y;
+  this.direction = direction;
+  this.speed = 400;
+}
 
 function render () {
 
