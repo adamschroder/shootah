@@ -39,7 +39,7 @@ io.sockets.on('connection', function (socket) {
 function createUser (socket, data) {
 
   var userData = {};
-
+  data = data || {};
   // if the user existed sometime before
 
   if (sessionIds[data.id]) {
