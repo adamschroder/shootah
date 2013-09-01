@@ -1,4 +1,4 @@
-//var socket = io.connect('http://192.168.2.95:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
