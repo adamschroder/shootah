@@ -16,6 +16,7 @@ var users = {};
 
 io.sockets.on('connection', function (socket) {
 
+  console.log('connected')
   socket.on('userJoined', function (data) {
 
     var user = createUser(socket, data);
