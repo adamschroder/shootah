@@ -40,8 +40,10 @@ socket.on('join', function (data) {
 socket.on('move', function (data) {
 
   var userToMove = users[data.id];
-  userToMove.x = data.x;
-  userToMove.y = data.y;
+  if (userToMove) {
+    userToMove.x = data.x;
+    userToMove.y = data.y;
+  }
 });
 
 // key events
