@@ -50,9 +50,10 @@ function updatePositions (list) {
     if (mover && data.id !== userData.id) {
       mover.x = data.x;
       mover.y = data.y;
+      mover.facing = data.facing;
     }
 
-    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
+    isMonster && (monsters[data.id] = data);
   }
 }
 
