@@ -1,5 +1,5 @@
- var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://192.168.2.95:8080');
+// var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -9,7 +9,7 @@ canvas.height = 600;
 
 var sessionId, userData;
 var users = {};
-var monsters = {};
+var monsters = [];
 var keysDown = {};
 
 try {
@@ -37,11 +37,14 @@ socket.on('join', function (data) {
 
 socket.on('move', function (data) {
 
-  var mover = data.type === 'monster' ? monsters[data.id] : users[data.id];
+  var isMonster = data.type === 'monster';
+  var mover = isMonster ? monsters[data.id] : users[data.id];
   if (mover) {
     mover.x = data.x;
     mover.y = data.y;
   }
+  // console.log(isMonster, data.id)
+  isMonster && (monsters[data.id] = data);
 });
 
 // key events
@@ -119,6 +122,11 @@ function render () {
 
     ctx.fillStyle = users[user].color;
     ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
+  }
+
+  var monster = [];
+  for (var i = 0, max = monsters.length; i < max; i++) {
+
   }
 }
 
