@@ -10,7 +10,8 @@ module.exports = (function () {
   var loopCount = 0;
   var interval = 10;
   var rate = 3;
-  var monsters = [];
+  var monsters = {};
+  var monsterIds = {};
   var maxMonsters = 100;
   var speed = 1;
   var numPlayers = 1;
@@ -24,6 +25,28 @@ module.exports = (function () {
     'y': 300
   };
   var badLuckUser;
+
+  function getMonsterId () {
+
+    var id = Math.random();
+    while (monsterIds[id]) {
+      id = Math.random();
+    }
+    monsterIds[id] = 1;
+    return id;
+  }
+
+  function damageMonster (data) {
+
+    var monster = monsters[data.id];
+    if (monster) {
+      monster.health -= data.damage;
+      if (monster.health <= 0) {
+        delete monsters[data.id];
+        self.emit('killedMonster', data.id);
+      }
+    }
+  }
 
   function updateTarget (data) {
 
@@ -45,9 +68,10 @@ module.exports = (function () {
 
     var monster;
 
-    for (var i = 0, max = monsters.length; i < max; i++) {
+
+    for (var id in monsters) {
       
-      monster = monsters[i];
+      monster = monsters[id];
       
       if (monster.x < target.x) {
         monster.x += speed;
@@ -70,6 +94,7 @@ module.exports = (function () {
   function Monster () {
 
     this.type = 'monster';
+    this.id = getMonsterId();
     this.height = this.width = 10;
     this.x = this.y = 0;
 
@@ -92,6 +117,8 @@ module.exports = (function () {
       offsetAmount = (Math.round(Math.random() * board.height));
       this.y = top ? this.y + offsetAmount : this.y - offsetAmount;
     }
+
+    this.health = 1;
   }
 
   function spawnMonsters () {
@@ -101,12 +128,12 @@ module.exports = (function () {
 
     for (var i = 0, max = amount; i < max; i++) {
 
-      if (monsters.length >= maxMonsters) {
+      if (Object.keys(monsters).length >= maxMonsters) {
         return false;
       }
 
       monster = new Monster();
-      monster.id = monsters.push(monster);
+      monsters[monster.id] = monster;
 
       self.emit('move', monster);
     }
@@ -129,5 +156,6 @@ module.exports = (function () {
   loop();
 
   self.updateTarget = updateTarget;
+  self.damageMonster = damageMonster;
   return self;
 })();
