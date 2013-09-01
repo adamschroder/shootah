@@ -1,24 +1,5 @@
-// var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
-var sessionId;
-socket.on('join', function (data) {
-
-  sessionId = socket.socket.sessionid;
-  console.log(sessionId)
-});
-
-socket.on('userJoined', function (data) {
-
-  console.log(data)
-});
-
-socket.on('move', function (data) {
-
-  console.log(data);
-  var spriteToUpdate = sprites[data.id];
-  spriteToUpdate.x = data.x;
-  spriteToUpdate.y = data.y;
-});
+var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -26,9 +7,46 @@ var ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 600;
 
-var mySprite = {};
+var sessionId, userData;
+var users = {};
 var keysDown = {};
-var sprites = {};
+
+try {
+
+  userData = JSON.parse(window.localStorage.getItem('user'));
+}
+catch (e){}
+
+// server events
+
+socket.emit('userJoined', userData);
+
+socket.on('join', function (data) {
+
+  sessionId = socket.socket.sessionid;
+
+  if (data.socketId === sessionId) {
+
+    window.localStorage.setItem('user', JSON.stringify(data));
+  }
+
+  users[data.id] = data;
+  userData = data;
+
+  // create the others on the board
+});
+
+
+socket.on('move', function (data) {
+
+  var userToMove = users[data.id];
+  if (userToMove) {
+    userToMove.x = data.x;
+    userToMove.y = data.y;
+  }
+});
+
+// key events
 
 window.addEventListener('keydown', function (e) {
 
@@ -40,47 +58,50 @@ window.addEventListener('keyup', function (e) {
   delete keysDown[e.keyCode];
 });
 
+// methods
 
 function update (mod) {
 
-  var offset = Object.keys(keysDown).length !== 0 && mySprite.speed * mod;
+
+  var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
 
   if (37 in keysDown && checkBounds()) {
 
-    mySprite.x -= offset;
-    socket.emit('updateMovement', mySprite);
+    userData.x -= offset;
+    socket.emit('updateMovement', userData);
   }
   if (38 in keysDown && checkBounds()) {
 
-    mySprite.y -= offset;
-    socket.emit('updateMovement', mySprite);
+    userData.y -= offset;
+    socket.emit('updateMovement', userData);
   }
   if (39 in keysDown && checkBounds()) {
 
-    mySprite.x += offset;
-    socket.emit('updateMovement', mySprite);
+    userData.x += offset;
+    socket.emit('updateMovement', userData);
   }
   if (40 in keysDown && checkBounds()) {
 
-   mySprite.y += offset;
-   socket.emit('updateMovement', mySprite);
+   userData.y += offset;
+   socket.emit('updateMovement', userData);
   }
 }
 
 
 function checkBounds () {
 
-  if (mySprite.x <= 0 || mySprite.y <= 0) {
+  if (userData.x <= 0 || userData.y <= 0) {
 
-    mySprite.x = mySprite.x + 1;
-    mySprite.y = mySprite.y + 1;
+    userData.x = userData.x + 1;
+    userData.y = userData.y + 1;
     return false;
   }
 
-  if (mySprite.x >= 750|| mySprite.y >= 550) {
+  if (userData.x >= 750|| userData.y >= 550) {
 
-    mySprite.x = mySprite.x - 1;
-    mySprite.y = mySprite.y - 1;
+    userData.x = userData.x - 1;
+    userData.y = userData.y - 1;
+
     return false;
   }
 
@@ -93,14 +114,15 @@ function render () {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (sprite in sprites) {
+  for (user in users) {
 
-    if (!sprites.hasOwnProperty(sprite)) {
+    if (!users.hasOwnProperty(user)) {
 
       continue;
     }
-    ctx.fillStyle = sprites[sprite].color;
-    ctx.fillRect(sprites[sprite].x, sprites[sprite].y, sprites[sprite].width, sprites[sprite].height);
+
+    ctx.fillStyle = users[user].color;
+    ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
   }
 }
 
