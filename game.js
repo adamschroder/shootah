@@ -25,6 +25,8 @@ socket.on('join', function (data) {
 
   sessionId = socket.socket.sessionid;
 
+  console.log('join', sessionId);
+
   if (data.socketId === sessionId) {
 
     window.localStorage.setItem('user', JSON.stringify(data));
