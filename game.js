@@ -1,5 +1,5 @@
- var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -246,7 +246,6 @@ function render () {
     ctx.fillStyle = '#fff';
     ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
-}
 
   var thisBullet;
   for (var bullet in bullets) {
