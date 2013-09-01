@@ -50,10 +50,9 @@ function updatePositions (list) {
     if (mover && data.id !== userData.id) {
       mover.x = data.x;
       mover.y = data.y;
-      mover.facing = data.facing;
     }
 
-    isMonster && (monsters[data.id] = data);
+    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
   }
 }
 
@@ -225,10 +224,10 @@ function checkBounds () {
     return false;
   }
 
-  if (userData.x >= 750|| userData.y >= 550) {
+  if (userData.x >= 760|| userData.y >= 560) {
 
-    userData.x = userData.x - 1;
-    userData.y = userData.y - 1;
+    userData.x = userData.x - 10;
+    userData.y = userData.y ;
 
     return false;
   }
