@@ -1,5 +1,5 @@
-var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+//var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -335,11 +335,12 @@ function render () {
 
   for (var user in users) {
 
-    ctx.fillStyle = users[user].color;
-    ctx.fillRect(users[user].x, users[user].y, 20, 30);
+    colorSprite(ctx, users[user]);
+
+    // dis is the white line for facing
     ctx.strokeStyle = "white";
     ctx.beginPath();
-    image.src = "images/character.png";
+    image.src = "images/blank-character-right.png";
 
     switch (users[user].facing) {
       case 'up':
@@ -361,13 +362,13 @@ function render () {
       case 'left':
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
-        image.src = "images/character-left.png";
+        image.src = "images/blank-character-left.png";
         ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
       break
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
-        image.src = "images/character.png";
+        image.src = "images/blank-character-right.png";
       break;
       case 'up-right':
         ctx.moveTo(users[user].x + 75, users[user].y + 20);
@@ -415,6 +416,17 @@ function render () {
   }
 }
 
+function colorSprite (ctx, user) {
+
+  var offset = user.facing === 'left' ? 19: 11;
+
+  ctx.fillStyle = user.color;
+  ctx.fillRect(user.x + offset,  user.y + 25, 20, 10); // shirt
+  ctx.fillStyle = user.eyeColor;
+  ctx.fillRect(user.x + offset + 1, user.y + 10, 18, 10); // eyes
+  ctx.fillStyle = user.pantsColor;
+  ctx.fillRect(user.x + offset + 2,  user.y + 35, 16, 5); // pants
+}
 
 function run () {
 
