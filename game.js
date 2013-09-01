@@ -1,5 +1,5 @@
-var socket = io.connect('http://192.168.2.95:8080');
-// var socket = io.connect('http://localhost:8080');
+//var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -61,28 +61,52 @@ window.addEventListener('keyup', function (e) {
 // methods
 function update (mod) {
 
-
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
 
-  if (37 in keysDown && checkBounds()) {
+  if (65 in keysDown && checkBounds()) { // left
 
     userData.x -= offset;
     socket.emit('updateMovement', userData);
   }
-  if (38 in keysDown && checkBounds()) {
+  if (87 in keysDown && checkBounds()) { // down
 
     userData.y -= offset;
     socket.emit('updateMovement', userData);
   }
-  if (39 in keysDown && checkBounds()) {
+  if (68 in keysDown && checkBounds()) { // right
 
     userData.x += offset;
     socket.emit('updateMovement', userData);
   }
-  if (40 in keysDown && checkBounds()) {
+  if (83 in keysDown && checkBounds()) { // up
 
    userData.y += offset;
    socket.emit('updateMovement', userData);
+  }
+
+  // pointing
+  if (38 in keysDown) {
+
+    userData.facing = 'up';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (37 in keysDown) {
+
+    userData.facing = 'left';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (39 in keysDown) {
+
+    userData.facing = 'right';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (40 in keysDown) {
+
+    userData.facing = 'down';
+    socket.emit('updateMovement', userData);
   }
 
   // space
