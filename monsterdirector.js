@@ -58,7 +58,7 @@ module.exports = (function () {
 
     changeTarget = Math.round(Math.random() * 10);
 
-    if (superBadLuck || !badLuckUser && changeTarget === 1) {
+    if (superBadLuck || !badLuckUser && changeTarget === 1 || badLuckUser === data.id) {
       target.x = data.x;
       target.y = data.y;
     }
