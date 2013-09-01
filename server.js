@@ -51,6 +51,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('newBullet', function (bullet) {
 
+
     io.sockets.emit('newBullet', bullet);
     bullets[bullet.id] = bullet;
   });
@@ -97,13 +98,13 @@ function updateUserCount () {
 
 function hitUser (data) {
 
-  console.log(sessionIds[data.id], data.id);
+  console.log('hitUser', sessionIds[data.id], data.id);
 
   var user = users[sessionIds[data.id]];
   if (user) {
     user.health -= data.damage;
     if (user.health <= 0) {
-      delete users[user.id];
+      user.isDead = true;
       io.sockets.emit('userDeath', user.id);
 
       updateUserCount();
@@ -129,6 +130,7 @@ function createUser (socket, data) {
 
     // remap old data
     userData = users[sessionIds[data.id]];
+    userData.isDead = false;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
   }
