@@ -22,7 +22,7 @@ module.exports = (function () {
   var numPlayers = 1;
 
   function moveMonsters () {
-    
+
   }
 
   function spawnMonsters () {
@@ -36,11 +36,12 @@ module.exports = (function () {
 
       // TODO: make spawn x/y random, to the edges of the board
       monster = {
+        'type': 'monster',
         'x': board.height/2,
         'y': board.width/2
       };
 
-      monsters.push(monster);
+      monster.id = monsters.push(monster);
 
       self.emit('move', monster);
     }

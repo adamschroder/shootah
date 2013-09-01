@@ -27,6 +27,12 @@ io.sockets.on('connection', function (socket) {
     console.log(data);
     socket.broadcast.emit('move', data);
   });
+
+  console.log('connection')
+  monsterdirector.on('move', function (data) {
+    console.log('asdasd')
+    socket.broadcast.emit('move', data);
+  })
 });
 
 

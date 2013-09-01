@@ -39,6 +39,7 @@ socket.on('join', function (data) {
 
 socket.on('move', function (data) {
 
+  console.log('data', data)
   var userToMove = users[data.id];
   if (userToMove) {
     userToMove.x = data.x;
