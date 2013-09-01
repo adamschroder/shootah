@@ -1,14 +1,15 @@
+// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
+var sessionId;
 socket.on('join', function (data) {
-  var user = createSprite();
-  socket.emit('userJoined', user)
-  console.log(data);
+
+  sessionId = socket.socket.sessionid;
+  console.log(sessionId)
 });
 
 socket.on('userJoined', function (data) {
 
   console.log(data)
-  createSprite(data);
 });
 
 socket.on('move', function (data) {
@@ -75,7 +76,7 @@ function checkBounds () {
     return false;
   }
 
-  if (mySprite.x >= 800 || mySprite.y >= 600) {
+  if (mySprite.x >= 750|| mySprite.y >= 550) {
 
     mySprite.x = mySprite.x - 1;
     mySprite.y = mySprite.y - 1;
@@ -100,24 +101,6 @@ function render () {
     ctx.fillStyle = sprites[sprite].color;
     ctx.fillRect(sprites[sprite].x, sprites[sprite].y, sprites[sprite].width, sprites[sprite].height);
   }
-}
-
-
-function createSprite (data) {
-
-  mySprite = {
-    id: data ? data.id : Math.floor(Math.random()*16777215),
-    x: data ? data.x : 200,
-    y: data ? data.y : 200,
-    width: 50,
-    height: 50,
-    speed: 200,
-    color: data ? data.color : '#'+Math.floor(Math.random()*16777215).toString(16)
-  }
-
-  sprites[mySprite.id] = mySprite;
-
-  return mySprite;
 }
 
 
