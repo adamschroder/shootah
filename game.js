@@ -7,10 +7,12 @@ var ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 600;
 
+var mod;
 var sessionId, userData;
 var users = {};
 var monsters = [];
-var bullets = [];
+var bullets = {};
+var ids = [];
 var keysDown = {};
 
 try {
@@ -59,7 +61,7 @@ window.addEventListener('keyup', function (e) {
 });
 
 // methods
-function update (mod) {
+function update () {
 
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
 
@@ -113,8 +115,19 @@ function update (mod) {
   if (32 in keysDown) {
 
     var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
-    console.log(bullet);
+    bullets[bullet.id] = bullet;
+    socket.emit('newBullet', bullet);
   }
+}
+
+function getUID () {
+
+  var id = Math.random();
+  while (ids[id]) {
+    id = Math.random();
+  }
+  ids[id] = 1;
+  return id;
 }
 
 
@@ -140,11 +153,31 @@ function checkBounds () {
 
 function Bullet (x, y, direction, owner) {
 
-  this.owner = owner;
-  this.x = x;
-  this.y = y;
-  this.direction = direction;
-  this.speed = 400;
+  var b = this;
+  b.owner = owner;
+  b.id = owner + getUID();
+  b.x = x;
+  b.y = y;
+  b.direction = direction;
+  b.speed = 500;
+}
+
+function updateBullet (b) {
+
+  var dir = b.direction;
+  var spd = b.speed;
+  if (dir === 'up') {
+    b.y -= spd * mod;
+  }
+  else if (dir === 'down') {
+    b.y += spd * mod;
+  }
+  else if (dir === 'left') {
+    b.x -= spd * mod;
+  }
+  else if (dir === 'right') {
+    b.x += spd * mod;
+  }
 }
 
 function render () {
@@ -154,13 +187,23 @@ function render () {
 
   for (var user in users) {
 
-    if (!users.hasOwnProperty(user)) {
+    if (users.hasOwnProperty(user)) {
 
-      continue;
+      ctx.fillStyle = users[user].color;
+      ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
     }
+  }
 
-    ctx.fillStyle = users[user].color;
-    ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
+  var thisBullet;
+  for (var bullet in bullets) {
+
+    if (bullets.hasOwnProperty(bullet)) {
+
+      thisBullet = bullets[bullet];
+      updateBullet(thisBullet);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(thisBullet.x, thisBullet.y, 1, 1);
+    }
   }
 
   var monster = [];
@@ -172,7 +215,9 @@ function render () {
 
 function run () {
 
-  update((Date.now() - time) / 1000);
+  mod = (Date.now() - time) / 1000
+
+  update();
   render();
   time = Date.now();
 

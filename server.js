@@ -13,6 +13,7 @@ io.set('transports', [
 var userIds = {};
 var sessionIds = {}; // sessionIds[id] returns old socket id, from socket id should look up old data
 var users = {};
+var bullets = {};
 
 io.sockets.on('connection', function (socket) {
 
@@ -27,6 +28,13 @@ io.sockets.on('connection', function (socket) {
         socket.emit('join', users[player]);
       }
     }
+
+    for (var bullet in bullets) {
+
+      if (bullets[bullet].owner !== user.id) {
+        socket.emit('newBullet', bullets[bullet]);
+      }
+    }
   });
 
   socket.on('updateMovement', function (data) {
@@ -35,10 +43,16 @@ io.sockets.on('connection', function (socket) {
     users[data.socketId] = data;
   });
 
-  console.log('connection')
+  socket.on('newBullet', function (bullet) {
+
+    io.sockets.emit('newBullet', bullet);
+    bullets[bullet.id] = bullet;
+    console.log('BULLET', bullet);
+  });
+
   monsterdirector.on('move', function (data) {
     io.sockets.emit('move', data);
-  })
+  });
 });
 
 
