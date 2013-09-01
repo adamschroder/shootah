@@ -1,7 +1,7 @@
 shootah
 =======
 
-<iframe width="560" height="315" src="//www.youtube.com/embed/F5zboV3_9KY" frameborder="0" allowfullscreen></iframe>
+www.youtube.com/embed/F5zboV3_9KY
 
 JS mulitplayer survival shootem-up
 
