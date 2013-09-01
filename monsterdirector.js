@@ -12,22 +12,18 @@ module.exports = (function () {
   var rate = 3;
   var monsters = [];
   var maxMonsters = 100;
+  var speed = 1;
+  var numPlayers = 1;
 
   var board = {
     'height': 600,
     'width': 800
   };
-
   var target = {
     'x': 400,
     'y': 300
   };
   var badLuckUser;
-
-  var speed = 1;
-
-  //stub
-  var numPlayers = 1;
 
   function updateTarget (data) {
 
