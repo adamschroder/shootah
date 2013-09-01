@@ -1,5 +1,5 @@
-//var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -160,7 +160,7 @@ function update () {
 
     if (canShoot) {
 
-      var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
+      var bullet = new Bullet(userData.x, userData.y + (userData.width / 2), userData.facing, userData.id);
       bullets[bullet.id] = bullet;
       socket.emit('newBullet', bullet);
     }
@@ -258,8 +258,13 @@ function updateBullet (b) {
     }
 
     var user = collidesWithUser(b);
+    var monster = collidesWithMonster(b);
 
-    console.log('collides with user', user);
+    if (user || monster) {
+
+      delete bullets[b.id];
+      socket.emit('killBullet', b.id);
+    }
   }
 }
 
@@ -282,20 +287,34 @@ function collidesWithUser (obj) {
 
   var thisUser;
   var collide;
+
   for (var user in users) {
+
     thisUser = users[user];
+    if (thisUser.id === userId) {continue;}
     collide = doBoxesIntersect(obj, thisUser);
 
     if (collide) {
+      console.log('hit', thisUser);
       return thisUser;
     }
   }
   return false;
 }
 
-function collidesWithMonster (x, y, w, h) {
+function collidesWithMonster (obj) {
 
-  //
+  var thisMonster;
+  var collide;
+  for (var monster in monsters) {
+    thisMonster = monsters[monster];
+    collide = doBoxesIntersect(obj, thisMonster);
+    if (collide) {
+      console.log('hit', thisMonster);
+      return thisMonster;
+    }
+  }
+  return false;
 }
 
 function isOnBoard (obj) {
@@ -385,12 +404,12 @@ function render () {
       thisBullet = bullets[bullet];
       if (thisBullet) {
         updateBullet(thisBullet);
-        var grd = ctx.createLinearGradient(thisBullet.x, thisBullet.y, 6, 3);
-        grd.addColorStop(1, '#d62822');
-        grd.addColorStop(0, '#f2b830');
-        thisBullet && (ctx.fillStyle = grd);
-        // ctx.fill();
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 6, 3));
+
+        thisBullet && (ctx.fillStyle = '#d62822');
+        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
+
+        thisBullet && (ctx.fillStyle = '#f2b830');
+        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
       }
     }
   }
