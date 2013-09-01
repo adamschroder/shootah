@@ -57,15 +57,35 @@ module.exports = (function () {
 
     this.type = 'monster';
     this.height = this.width = 10;
+    this.x = this.y = 0;
+
+    // start point: TL, TR, BL, BR
+    // offset path: x or y
+    // offset value: between 0 and (max - 100)
 
     var left = Math.round(Math.random() * 1);
     var top = Math.round(Math.random() * 1);
-    var offset = 25;
-    var position = {};
-    var halfSize = this.height / 2;
+    var offsetDirection = !!Math.round(Math.random() * 1) ? 'x': 'y';
+    var offsetAmount;
 
-    this.x = left ? (offset - halfSize) : ((board.width - offset));
-    this.y = top ? offset : (board.height - offset);
+    if (offsetDirection === 'x') {
+
+      offsetAmount = (Math.round(Math.random() * (board.width - 100)));
+      this.x += offsetAmount;
+    }
+    else {
+
+      offsetAmount = (Math.round(Math.random() * (board.height - 100)));
+      this.y += offsetAmount;
+    }
+
+    // console.log(offsetAmount)
+
+    // var offset = 25;
+    // var halfSize = this.height / 2;
+
+    // this.x = left ? (offset - halfSize) : ((board.width - offset));
+    // this.y = top ? offset : (board.height - offset);
   }
 
   function spawnMonsters () {
