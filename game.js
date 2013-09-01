@@ -1,5 +1,5 @@
- var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -224,11 +224,16 @@ function checkBounds () {
     return false;
   }
 
-  if (userData.x >= 760|| userData.y >= 560) {
+  if (userData.x >= 760) {
 
-    userData.x = userData.x - 10;
-    userData.y = userData.y ;
+    userData.x = userData.x - 5;
 
+    return false;
+  }
+
+  if (userData.y >= 500) {
+
+    userData.y = 490;
     return false;
   }
 
