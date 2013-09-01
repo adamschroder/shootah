@@ -49,14 +49,14 @@ socket.on('join', function (data) {
 
 function updatePositions (list) {
 
-  var data, id;
+  var data, id, monster, mover;
 
   for (var key in list) {
     data = list[key];
     id = data.id;
 
-    var isMonster = data.type === 'monster';
-    var mover = isMonster ? monsters[id] : users[id];
+    isMonster = data.type === 'monster';
+    mover = isMonster ? monsters[id] : users[id];
     if (mover && id !== userData.id) {
       mover.x = data.x;
       mover.y = data.y;
@@ -270,7 +270,6 @@ function checkBounds () {
   if (userData.x >= 760) {
 
     userData.x = userData.x - 5;
-
     return false;
   }
 
@@ -399,7 +398,6 @@ function collidesWithUser (obj) {
     collide = doBoxesIntersect(obj, thisUser);
 
     if (collide) {
-      console.log('hit', thisUser);
       return thisUser;
     }
   }
@@ -414,7 +412,6 @@ function collidesWithMonster (obj) {
     thisMonster = monsters[monster];
     collide = doBoxesIntersect(obj, thisMonster);
     if (collide) {
-      console.log('hit', thisMonster);
       return thisMonster;
     }
   }
