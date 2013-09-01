@@ -31,6 +31,8 @@ io.sockets.on('connection', function (socket) {
       }
     }
 
+    updateUserCount();
+
     for (var bullet in bullets) {
 
       if (bullets[bullet].owner !== user.id) {
@@ -78,6 +80,12 @@ monsterdirector.on('killedMonster', function (id) {
   io.sockets.emit('killedMonster', id);
 });
 
+function updateUserCount () {
+
+  var count = Object.keys(users).length;
+  monsterdirector.updateUserCount(count);
+}
+
 function hitUser (data) {
 
   console.log(sessionIds[data.id], data.id);
@@ -88,6 +96,8 @@ function hitUser (data) {
     if (user.health <= 0) {
       delete users[user.id];
       io.sockets.emit('userDeath', user.id);
+
+      updateUserCount();
     }
     else {
       io.sockets.emit('userDamaged', {
