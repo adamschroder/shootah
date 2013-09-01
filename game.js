@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
-=======
-var socket = io.connect('http://192.168.2.95:8080');
-// var socket = io.connect('http://localhost:8080');
->>>>>>> ffac839aebc2b896b6a6754b8bdc9a2b971d46a0
-
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
