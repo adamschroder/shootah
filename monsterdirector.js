@@ -37,13 +37,17 @@ module.exports = (function () {
     var amount = numPlayers * rate;
     var monster;
 
+
+    // console.log('SPAWN NEW MONSTERS');
     for (var i = 0, max = amount; i < max; i++) {
 
       // TODO: make spawn x/y random, to the edges of the board
       monster = {
         'type': 'monster',
         'x': board.height/2,
-        'y': board.width/2
+        'y': board.width/2,
+        'height': 100,
+        'width': 100
       };
 
       monster.id = monsters.push(monster);

@@ -1,4 +1,4 @@
-//var socket = io.connect('http://192.168.2.95:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
@@ -10,9 +10,9 @@ canvas.height = 600;
 var mod;
 var sessionId, userData;
 var users = {};
-var monsters = [];
 var bullets = {};
 var ids = [];
+var monsters = {};
 var keysDown = {};
 
 try {
@@ -45,18 +45,18 @@ socket.on('move', function (data) {
     mover.x = data.x;
     mover.y = data.y;
   }
-  // console.log(isMonster, data.id)
+
   isMonster && (monsters[data.id] = data);
 });
 
 // key events
 window.addEventListener('keydown', function (e) {
-
+  e.preventDefault();
   keysDown[e.keyCode] = true;
 });
 
 window.addEventListener('keyup', function (e) {
-
+  e.preventDefault();
   delete keysDown[e.keyCode];
 });
 
@@ -191,7 +191,43 @@ function render () {
 
       ctx.fillStyle = users[user].color;
       ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
+      ctx.strokeStyle = "white";
+
+      ctx.beginPath();
+
+      switch (users[user].facing) {
+        case 'up':
+          ctx.moveTo(users[user].x, users[user].y - 5);
+          ctx.lineTo(users[user].x + 50, users[user].y - 5);
+        break
+        case 'down':
+          ctx.moveTo(users[user].x , users[user].y + 55);
+          ctx.lineTo(users[user].x + 50, users[user].y + 55);
+        break
+        case 'left':
+          ctx.moveTo(users[user].x - 5, users[user].y);
+          ctx.lineTo(users[user].x - 5, users[user].y + 50);
+        break
+        case 'right':
+          ctx.moveTo(users[user].x + 55, users[user].y);
+          ctx.lineTo(users[user].x + 55, users[user].y + 50);
+        break
+      }
+
+      ctx.fill();
+      ctx.stroke();
+      ctx.closePath();
     }
+  }
+
+  var monster = [];
+
+  for (var id in monsters) {
+
+    monster = monsters[id];
+
+    ctx.fillStyle = '#ffc';
+    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
 
   var thisBullet;
@@ -204,11 +240,6 @@ function render () {
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(thisBullet.x, thisBullet.y, 1, 1);
     }
-  }
-
-  var monster = [];
-  for (var i = 0, max = monsters.length; i < max; i++) {
-
   }
 }
 
