@@ -1,5 +1,5 @@
 var socket = io.connect('http://192.168.2.95:8080');
-// var socket = io.connect('http://localhost:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -293,7 +293,7 @@ function doBoxesIntersect (a, b) {
   var ha = a.height + a.y;
   var hb = b.height + b.y;
   if (b.y > ha || a.y > hb) return false;
-  
+
   return true;
 }
 
@@ -354,6 +354,7 @@ function render () {
     ctx.fillRect(users[user].x, users[user].y, 20, 30);
     ctx.strokeStyle = "white";
     ctx.beginPath();
+    image.src = "images/character.png";
 
     switch (users[user].facing) {
       case 'up':
@@ -382,7 +383,6 @@ function render () {
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
         image.src = "images/character.png";
-        ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
       break;
       case 'up-right':
         ctx.moveTo(users[user].x + 75, users[user].y + 20);
@@ -393,6 +393,8 @@ function render () {
         ctx.lineTo(users[user].x + 35, users[user].y + 70);
       break;
     }
+
+    ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
 
     ctx.fill();
     ctx.stroke();
@@ -417,8 +419,12 @@ function render () {
       thisBullet = bullets[bullet];
       if (thisBullet) {
         updateBullet(thisBullet);
-        thisBullet && (ctx.fillStyle = '#FFFFFF');
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 5, 5));
+
+        thisBullet && (ctx.fillStyle = '#d62822');
+        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
+
+        thisBullet && (ctx.fillStyle = '#f2b830');
+        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
       }
     }
   }
