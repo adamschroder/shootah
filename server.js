@@ -11,7 +11,7 @@ io.set('transports', [
 ]);
 
 var userIds = {};
-var sessionIds =[0]; // sessionIds[id] returns old socket id, from socket id should look up old data
+var sessionIds = {}; // sessionIds[id] returns old socket id, from socket id should look up old data
 var users = {};
 
 io.sockets.on('connection', function (socket) {
@@ -32,7 +32,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('updateMovement', function (data) {
 
     io.sockets.emit('move', data);
-    users[data.id] = data;
+    users[data.socketId] = data;
   });
 
   console.log('connection')
@@ -56,9 +56,11 @@ function createUser (socket, data) {
     sessionIds[data.id] = socket.id;
   }
   else {
+
+    var id = getUID();
     // create new data
     userData = {
-      'id': sessionIds.length,
+      'id': id,
       'socketId': socket.id,
       'x': Math.random()*200,
       'y': Math.random()*200,
@@ -68,11 +70,20 @@ function createUser (socket, data) {
       'color': '#'+Math.floor(Math.random()*16777215).toString(16)
     };
 
-    sessionIds.push(socket.id);
+    sessionIds[userData.id] = socket.id;
   }
 
   // keep a map of the users data
   users[userData.socketId] = userData;
 
   return userData;
+}
+
+function getUID () {
+
+  var id = Math.random();
+  while (sessionIds[id]) {
+    id = Math.random();
+  }
+  return id;
 }
