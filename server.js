@@ -51,6 +51,12 @@ io.sockets.on('connection', function (socket) {
     console.log('BULLET', bullet);
   });
 
+  socket.on('killBullet', function (id) {
+
+    io.sockets.emit('killBullet', id);
+    bullets[id] && (delete bullets[id]);
+  });
+
   monsterdirector.on('move', function (data) {
     io.sockets.emit('move', data);
   });
