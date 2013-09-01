@@ -16,12 +16,12 @@ var users = {};
 
 io.sockets.on('connection', function (socket) {
 
-  console.log('connected')
   socket.on('userJoined', function (data) {
 
     var user = createUser(socket, data);
     io.sockets.emit('join', user);
 
+    // send other players to this joining player
     for (var player in users) {
       if (users[player].id !== user.id) {
         socket.emit('join', users[player]);
