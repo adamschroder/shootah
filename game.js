@@ -24,6 +24,7 @@ var scores = {};
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
   userData.isDead = false;
+  userData.health = 10;
 }
 catch (e) {}
 
