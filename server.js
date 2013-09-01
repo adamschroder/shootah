@@ -13,10 +13,6 @@ io.set('transports', [
 var userIds = {};
 var sessionIds =[0]; // sessionIds[id] returns old socket id, from socket id should look up old data
 var users = {};
-var board = {
-  'height': 600,
-  'width': 600
-};
 
 io.sockets.on('connection', function (socket) {
 
@@ -31,6 +27,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('updateMovement', function (data) {
 
+    console.log(data);
     socket.broadcast.emit('move', data);
   });
 });

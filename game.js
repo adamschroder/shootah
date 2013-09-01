@@ -14,6 +14,7 @@ socket.on('userJoined', function (data) {
 
 socket.on('move', function (data) {
 
+  console.log(data);
   var spriteToUpdate = sprites[data.id];
   spriteToUpdate.x = data.x;
   spriteToUpdate.y = data.y;
