@@ -144,7 +144,6 @@ function update () {
     socket.emit('updateMovement', userData);
   }
 
-
   if (40 in keysDown && 39 in keysDown) {
 
     userData.facing = 'down-right';
@@ -214,8 +213,24 @@ function updateBullet (b) {
   if (dir === 'up') {
     b.y -= spd * mod;
   }
+  else if (dir === 'up-left') {
+    b.y -= spd * mod;
+    b.x -= spd * mod;
+  }
+  else if (dir === 'up-right') {
+    b.y -= spd * mod;
+    b.x += spd * mod;
+  }
   else if (dir === 'down') {
     b.y += spd * mod;
+  }
+  else if (dir === 'down-left') {
+    b.y += spd * mod;
+    b.x -= spd * mod;
+  }
+  else if (dir === 'down-right') {
+    b.y += spd * mod;
+    b.x += spd * mod;
   }
   else if (dir === 'left') {
     b.x -= spd * mod;
@@ -282,7 +297,7 @@ function render () {
   for (var id in monsters) {
 
     monster = monsters[id];
-    
+
     ctx.fillStyle = '#fff';
     ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
