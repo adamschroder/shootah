@@ -107,11 +107,9 @@ module.exports = (function () {
 
       monster = new Monster();
       monster.id = monsters.push(monster);
-
-      self.emit('move', monster);
     }
   }
-  
+
   function loop () {
 
     loopCount++;
@@ -122,6 +120,8 @@ module.exports = (function () {
       loopCount = 0;
       spawnMonsters();
     }
+
+    self.emit('move', monsters);
 
     setTimeout(loop, interval);
   }

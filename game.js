@@ -1,5 +1,5 @@
-// var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://192.168.2.95:8080');
+// var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -38,17 +38,32 @@ socket.on('join', function (data) {
   users[data.id] = data;
 });
 
+function updatePositions (list) {
+
+  var data;
+
+  for (var i = 0, max = list.length; i < max; i++) {
+    data = list[i];
+
+    var isMonster = data.type === 'monster';
+    var mover = isMonster ? monsters[data.id] : users[data.id];
+    if (mover && data.id !== userData.id) {
+      mover.x = data.x;
+      mover.y = data.y;
+    }
+
+    isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+  }
+}
 
 socket.on('move', function (data) {
 
-  var isMonster = data.type === 'monster';
-  var mover = isMonster ? monsters[data.id] : users[data.id];
-  if (mover && data.id !== userData.id) {
-    mover.x = data.x;
-    mover.y = data.y;
+  if (data instanceof Array) {
+    updatePositions(data);
   }
-
-  isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+  else {
+    updatePositions([data])
+  }
 });
 
 socket.on('newBullet', function (data) {
