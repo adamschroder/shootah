@@ -29,7 +29,6 @@ module.exports = (function () {
 
   function moveMonsters () {
 
-    // console.log('MOVE THE MONSTERS');
     var monster;
 
     for (var i = 0, max = monsters.length; i < max; i++) {
