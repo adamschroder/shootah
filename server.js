@@ -16,6 +16,7 @@ var users = {};
 
 io.sockets.on('connection', function (socket) {
 
+  console.log('connected')
   socket.on('userJoined', function (data) {
 
     var user = createUser(socket, data);
@@ -26,6 +27,12 @@ io.sockets.on('connection', function (socket) {
 
     io.sockets.emit('move', data);
   });
+
+  console.log('connection')
+  monsterdirector.on('move', function (data) {
+    console.log('asdasd')
+    socket.broadcast.emit('move', data);
+  })
 });
 
 

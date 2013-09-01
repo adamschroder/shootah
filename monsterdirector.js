@@ -22,7 +22,15 @@ module.exports = (function () {
   var numPlayers = 1;
 
   function moveMonsters () {
-    
+
+    console.log('MOVE THE MONSTERS');
+    var monster;
+
+    for (var i = 0, max = monsters.length; i < max; i++) {
+      monster = monsters[i];
+      // calculate movement towards target
+      // emit move event
+    }
   }
 
   function spawnMonsters () {
@@ -30,17 +38,18 @@ module.exports = (function () {
     var amount = numPlayers * rate;
     var monster;
 
-    console.log('spawn')
+    console.log('SPAWN NEW MONSTERS');
 
     for (var i = 0, max = amount; i < max; i++) {
 
       // TODO: make spawn x/y random, to the edges of the board
       monster = {
+        'type': 'monster',
         'x': board.height/2,
         'y': board.width/2
       };
 
-      monsters.push(monster);
+      monster.id = monsters.push(monster);
 
       self.emit('move', monster);
     }
