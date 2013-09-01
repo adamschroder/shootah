@@ -22,6 +22,7 @@ module.exports = (function () {
     'x': 400,
     'y': 300
   };
+  var badLuckUser;
 
   var speed = 1;
 
@@ -30,8 +31,15 @@ module.exports = (function () {
 
   function updateTarget (data) {
 
+    superBadLuck = Math.round(Math.random() * 100) === 1;
+
+    if (superBadLuck) {
+      badLuckUser = data.id;
+    }
+
     changeTarget = Math.round(Math.random() * 10);
-    if (changeTarget === 1) {
+
+    if (superBadLuck || !badLuckUser && changeTarget === 1) {
       target.x = data.x;
       target.y = data.y;
     }
