@@ -1,5 +1,5 @@
-var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -9,6 +9,7 @@ canvas.height = 600;
 
 var sessionId, userData;
 var users = {};
+var monsters = {};
 var keysDown = {};
 
 try {
@@ -41,11 +42,10 @@ socket.on('join', function (data) {
 
 socket.on('move', function (data) {
 
-  console.log('data', data)
-  var userToMove = users[data.id];
-  if (userToMove) {
-    userToMove.x = data.x;
-    userToMove.y = data.y;
+  var mover = data.type === 'monster' ? monsters[data.id] : users[data.id];
+  if (mover) {
+    mover.x = data.x;
+    mover.y = data.y;
   }
 });
 
