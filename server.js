@@ -87,6 +87,7 @@ monsterdirector.on('updateScore', function (user, score) {
   }
   scoreBoard[user] += score;
 
+  console.log('SCORE', scoreBoard);
   io.sockets.emit('updateScore', scoreBoard);
 });
 

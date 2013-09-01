@@ -3,9 +3,13 @@ var socket = io.connect('http://192.168.2.95:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-
 canvas.width = 800;
 canvas.height = 600;
+
+var scoreCanvas = document.getElementById('score');
+var scoreCtx = scoreCanvas.getContext('2d');
+scoreCanvas.width = 800;
+scoreCanvas.height = 100;
 
 var mod;
 var sessionId, userData;
@@ -15,6 +19,7 @@ var bullets = {};
 var ids = [];
 var monsters = {};
 var keysDown = {};
+var scores = {};
 
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
@@ -99,8 +104,8 @@ socket.on('userDeath', function (id) {
   // todo animation of user death?
 });
 
-socket.on('updateScore', function (scores) {
-  console.log('scores', scores);
+socket.on('updateScore', function (_scores) {
+  scores = _scores;
 });
 
 // key events
@@ -422,6 +427,9 @@ function isOnBoard (obj) {
 
 function render () {
 
+  scoreCtx.fillStyle = '#f00';
+  scoreCtx.fillRect(0, 0, scoreCanvas.width, scoreCanvas.height);
+
   // ctx.fillStyle = '#000';
 
   var patternImg = new Image()
@@ -520,6 +528,18 @@ function render () {
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
+  }
+
+  var offset = 0;
+  image.src = 'images/blank-character-right.png';
+
+  for (var player in scores) {
+    scoreCtx.font = "30px Arial";
+    scoreCtx.fillText('' + scores[player], 25, 0);
+    scoreCtx.drawImage(image, offset, 0, 50, 50);
+    
+    // offset += 50;
+    // console.log('SCR', player, scores[player])
   }
 }
 
