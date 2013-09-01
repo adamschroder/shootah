@@ -1,5 +1,5 @@
-//var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -38,17 +38,32 @@ socket.on('join', function (data) {
   users[data.id] = data;
 });
 
+function updatePositions (list) {
+
+  var data;
+
+  for (var i = 0, max = list.length; i < max; i++) {
+    data = list[i];
+
+    var isMonster = data.type === 'monster';
+    var mover = isMonster ? monsters[data.id] : users[data.id];
+    if (mover && data.id !== userData.id) {
+      mover.x = data.x;
+      mover.y = data.y;
+    }
+
+    isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+  }
+}
 
 socket.on('move', function (data) {
 
-  var isMonster = data.type === 'monster';
-  var mover = isMonster ? monsters[data.id] : users[data.id];
-  if (mover && data.id !== userData.id) {
-    mover.x = data.x;
-    mover.y = data.y;
+  if (data instanceof Array) {
+    updatePositions(data);
   }
-
-  isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+  else {
+    updatePositions([data])
+  }
 });
 
 socket.on('newBullet', function (data) {
@@ -329,9 +344,34 @@ function render () {
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   image = new Image();
 
+  var monster;
+
+  for (var id in monsters) {
+
+    monster = monsters[id];
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+  }
+
+  var thisBullet;
+  for (var bullet in bullets) {
+
+    if (bullets.hasOwnProperty(bullet)) {
+
+      thisBullet = bullets[bullet];
+      if (thisBullet) {
+        updateBullet(thisBullet);
+
+        thisBullet && (ctx.fillStyle = '#d62822');
+        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
+
+        thisBullet && (ctx.fillStyle = '#f2b830');
+        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
+      }
+    }
+  }
 
   for (var user in users) {
 
@@ -385,34 +425,6 @@ function render () {
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
-  }
-
-  var monster = [];
-
-  for (var id in monsters) {
-
-    monster = monsters[id];
-
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
-  }
-
-  var thisBullet;
-  for (var bullet in bullets) {
-
-    if (bullets.hasOwnProperty(bullet)) {
-
-      thisBullet = bullets[bullet];
-      if (thisBullet) {
-        updateBullet(thisBullet);
-
-        thisBullet && (ctx.fillStyle = '#d62822');
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
-
-        thisBullet && (ctx.fillStyle = '#f2b830');
-        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
-      }
-    }
   }
 }
 
