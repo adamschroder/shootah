@@ -1,5 +1,5 @@
-var socket = io.connect('http://192.168.2.95:8080');
-// var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -49,8 +49,8 @@ function updatePositions (list) {
 
   var data;
 
-  for (var i = 0, max = list.length; i < max; i++) {
-    data = list[i];
+  for (var key in list) {
+    data = list[key];
 
     var isMonster = data.type === 'monster';
     var mover = isMonster ? monsters[data.id] : users[data.id];
@@ -65,11 +65,14 @@ function updatePositions (list) {
 
 socket.on('move', function (data) {
 
-  if (data instanceof Array) {
-    updatePositions(data);
+  if (data.id) {
+
+    var list = {};
+    list[data.id] = data;
+    updatePositions(list);
   }
   else {
-    updatePositions([data]);
+    updatePositions(data);
   }
 });
 
