@@ -78,6 +78,11 @@ socket.on('killBullet', function (id) {
   bullets[id] && (delete bullets[id]);
 });
 
+socket.on('killedMonster', function (id) {
+
+  monsters[id] && (delete monsters[id]);
+});
+
 // key events
 window.addEventListener('keydown', function (e) {
   e.preventDefault();
@@ -273,7 +278,15 @@ function updateBullet (b) {
     }
 
     var user = collidesWithUser(b);
+    if (user) {
+      socket.emit('hitUser', {'id': user.id, 'damage': 1});
+    }
     var monster = collidesWithMonster(b);
+    if (monster) {
+      monster.health -= 1;
+      (monster.health <= 0) && (delete monsters[monster.id]);
+      socket.emit('hitMonster', {'id': monster.id, 'damage': 1});
+    }
 
     if (user || monster) {
 

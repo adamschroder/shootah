@@ -10,6 +10,8 @@ io.set('transports', [
 , 'jsonp-polling'
 ]);
 
+io.set('log level', 2);
+
 var userIds = {};
 var sessionIds = {}; // sessionIds[id] returns old socket id, from socket id should look up old data
 var users = {};
@@ -57,8 +59,18 @@ io.sockets.on('connection', function (socket) {
     bullets[id] && (delete bullets[id]);
   });
 
+  socket.on('hitMonster', function (data) {
+
+    monsterdirector.damageMonster(data);
+  });
+
   monsterdirector.on('move', function (data) {
     io.sockets.emit('move', data);
+  });
+
+  monsterdirector.on('killedMonster', function (id) {
+
+    io.sockets.emit('killedMonster', id);
   });
 });
 
@@ -89,6 +101,7 @@ function createUser (socket, data) {
       'height': 50,
       'speed': 200,
       'color': '#'+Math.floor(Math.random()*16777215).toString(16),
+      'health': 10,
       'eyeColor': eyeColors[Math.floor(Math.random()*eyeColors.length)],
       'pantsColor': '#'+Math.floor(Math.random()*16777215).toString(16),
       'facing':'down'
