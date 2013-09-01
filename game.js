@@ -228,11 +228,16 @@ function checkBounds () {
     return false;
   }
 
-  if (userData.x >= 760|| userData.y >= 560) {
+  if (userData.x >= 760) {
 
-    userData.x = userData.x - 10;
-    userData.y = userData.y ;
+    userData.x = userData.x - 5;
 
+    return false;
+  }
+
+  if (userData.y >= 500) {
+
+    userData.y = 490;
     return false;
   }
 
