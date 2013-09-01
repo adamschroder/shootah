@@ -19,7 +19,7 @@ var keysDown = {};
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
 }
-catch (e){}
+catch (e) {}
 
 // server events
 
@@ -52,7 +52,7 @@ function updatePositions (list) {
       mover.y = data.y;
     }
 
-    isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
   }
 }
 
