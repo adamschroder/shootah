@@ -114,7 +114,7 @@ window.addEventListener('keyup', function (e) {
 var canShoot = false;
 var bulletTimer = setInterval(function () {
   canShoot =  true;
-}, 300);
+}, 150);
 
 function update () {
 
@@ -386,7 +386,7 @@ function render () {
 
     monster = monsters[id];
     // ctx.fillStyle = '#fff';
-    ctx.drawImage(monsterImage, monster.x, monster.y, monster.width*5, monster.height*5);
+    ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
     //ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
 
