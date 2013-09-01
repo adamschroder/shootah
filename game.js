@@ -1,5 +1,5 @@
-var socket = io.connect('http://192.168.2.95:8080');
-// var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -160,7 +160,7 @@ function update () {
 
     if (canShoot) {
 
-      var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
+      var bullet = new Bullet(userData.x, userData.y + (userData.width / 2), userData.facing, userData.id);
       bullets[bullet.id] = bullet;
       socket.emit('newBullet', bullet);
     }
