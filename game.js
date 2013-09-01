@@ -1,5 +1,5 @@
-//var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -49,12 +49,12 @@ socket.on('move', function (data) {
 
 // key events
 window.addEventListener('keydown', function (e) {
-
+  e.preventDefault();
   keysDown[e.keyCode] = true;
 });
 
 window.addEventListener('keyup', function (e) {
-
+  e.preventDefault();
   delete keysDown[e.keyCode];
 });
 
@@ -161,6 +161,7 @@ function render () {
 
     ctx.fillStyle = users[user].color;
     ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
+    // swap sprite to facing direction
   }
 
   var monster = [];
