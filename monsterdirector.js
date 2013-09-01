@@ -27,6 +27,15 @@ module.exports = (function () {
   //stub
   var numPlayers = 1;
 
+  function updateTarget (data) {
+
+    changeTarget = Math.round(Math.random() * 1);
+    if (changeTarget) {
+      target.x = data.x;
+      target.y = data.y;
+    }
+  }
+
   function moveMonsters () {
 
     var monster;
@@ -57,15 +66,27 @@ module.exports = (function () {
 
     this.type = 'monster';
     this.height = this.width = 10;
+    this.x = this.y = 0;
 
     var left = Math.round(Math.random() * 1);
     var top = Math.round(Math.random() * 1);
-    var offset = 25;
-    var position = {};
-    var halfSize = this.height / 2;
 
-    this.x = left ? (offset - halfSize) : ((board.width - offset));
-    this.y = top ? offset : (board.height - offset);
+    this.x = left ? 0 : board.width;
+    this.y = top ? 0 : board.height;
+
+    var offsetDirection = !!Math.round(Math.random() * 1) ? 'x': 'y';
+    var offsetAmount;
+
+    if (offsetDirection === 'x') {
+
+      offsetAmount = (Math.round(Math.random() * board.width));
+      this.x = left ? this.x + offsetAmount : this.x - offsetAmount;
+    }
+    else {
+
+      offsetAmount = (Math.round(Math.random() * board.height));
+      this.y = top ? this.y + offsetAmount : this.y - offsetAmount;
+    }
   }
 
   function spawnMonsters () {
@@ -98,5 +119,6 @@ module.exports = (function () {
 
   loop();
 
+  self.updateTarget = updateTarget;
   return self;
 })();
