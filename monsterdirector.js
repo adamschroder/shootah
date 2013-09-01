@@ -18,8 +18,8 @@ module.exports = (function () {
   };
 
   var target = {
-    'x': 300,
-    'y': 400
+    'x': 400,
+    'y': 300
   };
 
   var speed = 10;
@@ -35,8 +35,21 @@ module.exports = (function () {
       
       monster = monsters[i];
       
-      // calculate movement towards target
-      // emit move event
+      if (monster.x < target.x) {
+        monster.x += speed;
+      }
+      else {
+        monster.x -= speed;
+      }
+
+      if (monster.y < target.y) {
+        monster.y += speed;
+      }
+      else {
+        monster.y -= speed;
+      }
+
+      self.emit('move', monster);
     }
   }
 
