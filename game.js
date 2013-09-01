@@ -258,8 +258,13 @@ function updateBullet (b) {
     }
 
     var user = collidesWithUser(b);
+    var monster = collidesWithMonster(b);
 
-    console.log('collides with user', user);
+    if (user || monster) {
+
+      delete bullets[b.id];
+      socket.emit('killBullet', b.id);
+    }
   }
 }
 
@@ -282,20 +287,34 @@ function collidesWithUser (obj) {
 
   var thisUser;
   var collide;
+
   for (var user in users) {
+
     thisUser = users[user];
+    if (thisUser.id === userId) {continue;}
     collide = doBoxesIntersect(obj, thisUser);
 
     if (collide) {
+      console.log('hit', thisUser);
       return thisUser;
     }
   }
   return false;
 }
 
-function collidesWithMonster (x, y, w, h) {
+function collidesWithMonster (obj) {
 
-  //
+  var thisMonster;
+  var collide;
+  for (var monster in monsters) {
+    thisMonster = monsters[monster];
+    collide = doBoxesIntersect(obj, thisMonster);
+    if (collide) {
+      console.log('hit', thisMonster);
+      return thisMonster;
+    }
+  }
+  return false;
 }
 
 function isOnBoard (obj) {
