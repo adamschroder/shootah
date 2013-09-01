@@ -21,6 +21,12 @@ io.sockets.on('connection', function (socket) {
 
     var user = createUser(socket, data);
     io.sockets.emit('join', user);
+
+    for (var player in users) {
+      if (users[player].id !== user.id) {
+        socket.emit('join', users[player]);
+      }
+    }
   });
 
   socket.on('updateMovement', function (data) {
