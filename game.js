@@ -1,5 +1,5 @@
-// var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
+ var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -41,7 +41,7 @@ socket.on('move', function (data) {
 
   var isMonster = data.type === 'monster';
   var mover = isMonster ? monsters[data.id] : users[data.id];
-  if (mover) {
+  if (mover && data.id !== userData.id) {
     mover.x = data.x;
     mover.y = data.y;
   }
