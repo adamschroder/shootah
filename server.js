@@ -64,6 +64,11 @@ io.sockets.on('connection', function (socket) {
     monsterdirector.damageMonster(data);
   });
 
+  socket.on('hitUser', function (data) {
+
+    hitUser(data);
+  });
+
   monsterdirector.on('move', function (data) {
     io.sockets.emit('move', data);
   });
@@ -73,6 +78,25 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('killedMonster', id);
   });
 });
+
+function hitUser (data) {
+
+  var user = users[data.id];
+  if (user) {
+    user.health -= data.damage;
+    if (user.health <= 0) {
+      delete users[user.id];
+      io.sockets.emit('userDeath', user.id);
+    }
+    else {
+      io.sockets.emit('userDamaged', {
+        'id': user.id,
+        'health': user.health
+      });
+    }
+  }
+
+}
 
 
 function createUser (socket, data) {
