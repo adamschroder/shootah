@@ -18,6 +18,7 @@ var keysDown = {};
 
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
+  userData.isDead = false;
 }
 catch (e) {}
 
@@ -95,7 +96,7 @@ socket.on('userDamaged', function (data) {
 socket.on('userDeath', function (id) {
 
   var user = users[id];
-  user && delete users[id];
+  id !== userId && user && delete users[id];
   // todo animation of user death?
 });
 
@@ -112,12 +113,41 @@ window.addEventListener('keyup', function (e) {
 
 // methods
 
-var canShoot = false;
+// rate limiting
+var canShoot = true;
 var bulletTimer = setInterval(function () {
   canShoot =  true;
 }, 150);
 
+var canTakeDamage = true;
+var damageTimer = setInterval(function () {
+  canTakeDamage =  true;
+}, 500);
+
+
+function checkUserCollisions () {
+
+  if (!canTakeDamage) {
+    return;
+  }
+  else {
+    canTakeDamage = false;
+  }
+
+  var monster = collidesWithMonster(userData);
+  if (monster) {
+
+    userData.health -= monster.damage;
+    (userData.health <= 0) && (userData.isDead = true) && console.log('you dead');
+    socket.emit('hitUser', {'id': userData.id, 'damage': monster.damage});
+  }
+}
+
 function update () {
+
+  if (userData.isDead) {
+    return;
+  }
 
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
 
@@ -480,6 +510,7 @@ function run () {
 
   mod = (Date.now() - time) / 1000;
 
+  checkUserCollisions();
   update();
   render();
   time = Date.now();
