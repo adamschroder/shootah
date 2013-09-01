@@ -126,7 +126,12 @@ function run () {
   update((Date.now() - time) / 1000);
   render();
   time = Date.now();
+
+  // loop on next available frame
+  window.requestAnimationFrame(run);
 }
 
 var time = Date.now();
-setInterval(run, 10);
+
+// start on next available frame
+window.requestAnimationFrame(run);
