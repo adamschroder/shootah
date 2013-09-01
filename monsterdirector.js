@@ -8,9 +8,10 @@ module.exports = (function () {
   var self = new events.EventEmitter();
 
   var loopCount = 0;
-  var interval = 100;
+  var interval = 10;
   var rate = 3;
   var monsters = [];
+  var maxMonsters = 100;
 
   var board = {
     'height': 600,
@@ -22,15 +23,15 @@ module.exports = (function () {
     'y': 300
   };
 
-  var speed = 10;
+  var speed = 1;
 
   //stub
   var numPlayers = 1;
 
   function updateTarget (data) {
 
-    changeTarget = Math.round(Math.random() * 1);
-    if (changeTarget) {
+    changeTarget = Math.round(Math.random() * 10);
+    if (changeTarget === 1) {
       target.x = data.x;
       target.y = data.y;
     }
@@ -96,6 +97,10 @@ module.exports = (function () {
 
     for (var i = 0, max = amount; i < max; i++) {
 
+      if (monsters.length >= maxMonsters) {
+        return false;
+      }
+
       monster = new Monster();
       monster.id = monsters.push(monster);
 
@@ -109,7 +114,7 @@ module.exports = (function () {
     
     moveMonsters();
 
-    if (loopCount === 10) {
+    if (loopCount === 100) {
       loopCount = 0;
       spawnMonsters();
     }

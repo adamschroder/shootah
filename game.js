@@ -9,6 +9,7 @@ canvas.height = 600;
 
 var mod;
 var sessionId, userData;
+var userId;
 var users = {};
 var bullets = {};
 var ids = [];
@@ -31,6 +32,7 @@ socket.on('join', function (data) {
 
     window.localStorage.setItem('user', JSON.stringify(data));
     userData = data;
+    userId = data.id;
   }
 
   users[data.id] = data;
@@ -46,7 +48,7 @@ socket.on('move', function (data) {
     mover.y = data.y;
   }
 
-  isMonster ? (monsters[data.id] = data): mover.facing = data.facing;
+  isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
 });
 
 socket.on('newBullet', function (data) {
@@ -56,6 +58,11 @@ socket.on('newBullet', function (data) {
   if (!bullets[data.id]) {
     bullets[data.id] = data;
   }
+});
+
+socket.on('killBullet', function (id) {
+
+  bullets[id] && (delete bullets[id]);
 });
 
 // key events
@@ -238,6 +245,62 @@ function updateBullet (b) {
   else if (dir === 'right') {
     b.x += spd * mod;
   }
+
+  if (b.owner === userId) {
+
+    var isInbounds = isOnBoard(b);
+
+    if (!isInbounds) {
+
+      delete bullets[b.id];
+      socket.emit('killBullet', b.id);
+      return;
+    }
+
+    // console.log(isInbounds);
+
+
+    var user = collidesWithUser(b);
+  }
+}
+
+function doBoxesIntersect (a, b) {
+
+  var ax, ay, bx, by;
+  ax = a.x / a.width;
+  ay = a.y / a.height;
+  bx = b.x / b.width;
+  by = b.y / b.height;
+
+  return (Math.abs(ax - bx) * 2 < (a.width + b.width)) && (Math.abs(ay - by) * 2 < (a.height + b.height));
+}
+
+function collidesWithUser (obj) {
+
+  var thisUser;
+  var collide;
+  for (var user in users) {
+    thisUser = users[user];
+    collide = doBoxesIntersect(obj, thisUser);
+
+    if (collide) {
+      return thisUser;
+    }
+  }
+  return false;
+}
+
+function collidesWithMonster (x, y, w, h) {
+
+  //
+}
+
+function isOnBoard (obj) {
+
+  if (obj.x > 800 || obj.y > 600 || obj.x < 0 || obj.y < 0) {
+    return false;
+  }
+  return true;
 }
 
 function render () {
@@ -315,9 +378,11 @@ function render () {
     if (bullets.hasOwnProperty(bullet)) {
 
       thisBullet = bullets[bullet];
-      updateBullet(thisBullet);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(thisBullet.x, thisBullet.y, 5, 5);
+      if (thisBullet) {
+        updateBullet(thisBullet);
+        thisBullet && (ctx.fillStyle = '#FFFFFF');
+        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 5, 5));
+      }
     }
   }
 }
