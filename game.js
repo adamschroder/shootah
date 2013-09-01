@@ -164,68 +164,72 @@ function update () {
 
   // movement
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
+  var movement = false;
   if (65 in keysDown && checkBounds()) { // left
 
     userData.x -= offset;
-    socket.emit('updateMovement', userData);
+    movement = true;
   }
   else if (87 in keysDown && checkBounds()) { // down
 
     userData.y -= offset;
-    socket.emit('updateMovement', userData);
+    movement = true;
   }
   else if (68 in keysDown && checkBounds()) { // right
 
     userData.x += offset;
-    socket.emit('updateMovement', userData);
+    movement = true;
   }
   else if (83 in keysDown && checkBounds()) { // up
 
    userData.y += offset;
-   socket.emit('updateMovement', userData);
+   movement = true;
   }
+  movement && socket.emit('updateMovement', userData);
 
   // aiming
+  var aiming = false;
   if (38 in keysDown && 37 in keysDown) {
 
     userData.facing = 'up-left';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (40 in keysDown && 37 in keysDown) {
 
     userData.facing = 'down-left';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (38 in keysDown && 39 in keysDown) {
 
     userData.facing = 'up-right';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (40 in keysDown && 39 in keysDown) {
 
     userData.facing = 'down-right';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (38 in keysDown) {
 
     userData.facing = 'up';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (37 in keysDown) {
 
     userData.facing = 'left';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (39 in keysDown) {
 
     userData.facing = 'right';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
   else if (40 in keysDown) {
 
     userData.facing = 'down';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
+  aiming && socket.emit('updateMovement', userData);
 
   // space
   if (32 in keysDown) {
