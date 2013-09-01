@@ -67,7 +67,8 @@ function createUser (socket, data) {
       'width': 50,
       'height': 50,
       'speed': 200,
-      'color': '#'+Math.floor(Math.random()*16777215).toString(16)
+      'color': '#'+Math.floor(Math.random()*16777215).toString(16),
+      'facing':'down'
     };
 
     sessionIds[userData.id] = socket.id;
