@@ -168,10 +168,12 @@ function render () {
   for (var id in monsters) {
 
     monster = monsters[id];
-
-    ctx.fillStyle = '#ffc';
+    
+    ctx.fillStyle = '#fff';
     ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
+
+  // debugger;;
 }
 
 
