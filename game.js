@@ -1,5 +1,5 @@
-// var socket = io.connect('http://192.168.2.95:8080');
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -38,17 +38,32 @@ socket.on('join', function (data) {
   users[data.id] = data;
 });
 
+function updatePositions (list) {
+
+  var data;
+
+  for (var i = 0, max = list.length; i < max; i++) {
+    data = list[i];
+
+    var isMonster = data.type === 'monster';
+    var mover = isMonster ? monsters[data.id] : users[data.id];
+    if (mover && data.id !== userData.id) {
+      mover.x = data.x;
+      mover.y = data.y;
+    }
+
+    isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+  }
+}
 
 socket.on('move', function (data) {
 
-  var isMonster = data.type === 'monster';
-  var mover = isMonster ? monsters[data.id] : users[data.id];
-  if (mover && data.id !== userData.id) {
-    mover.x = data.x;
-    mover.y = data.y;
+  if (data instanceof Array) {
+    updatePositions(data);
   }
-
-  isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+  else {
+    updatePositions([data])
+  }
 });
 
 socket.on('newBullet', function (data) {
@@ -291,7 +306,7 @@ function doBoxesIntersect (a, b) {
   var ha = a.height + a.y;
   var hb = b.height + b.y;
   if (b.y > ha || a.y > hb) return false;
-  
+
   return true;
 }
 
@@ -342,16 +357,43 @@ function render () {
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   image = new Image();
 
+  var monster;
+
+  for (var id in monsters) {
+
+    monster = monsters[id];
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+  }
+
+  var thisBullet;
+  for (var bullet in bullets) {
+
+    if (bullets.hasOwnProperty(bullet)) {
+
+      thisBullet = bullets[bullet];
+      if (thisBullet) {
+        updateBullet(thisBullet);
+
+        thisBullet && (ctx.fillStyle = '#d62822');
+        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
+
+        thisBullet && (ctx.fillStyle = '#f2b830');
+        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
+      }
+    }
+  }
 
   for (var user in users) {
 
-    ctx.fillStyle = users[user].color;
-    ctx.fillRect(users[user].x, users[user].y, 20, 30);
+    colorSprite(ctx, users[user]);
+
+    // dis is the white line for facing
     ctx.strokeStyle = "white";
     ctx.beginPath();
+    image.src = "images/blank-character-right.png";
 
     switch (users[user].facing) {
       case 'up':
@@ -373,14 +415,13 @@ function render () {
       case 'left':
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
-        image.src = "images/character-left.png";
+        image.src = "images/blank-character-left.png";
         ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
       break
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
-        image.src = "images/character.png";
-        ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
+        image.src = "images/blank-character-right.png";
       break;
       case 'up-right':
         ctx.moveTo(users[user].x + 75, users[user].y + 20);
@@ -392,36 +433,25 @@ function render () {
       break;
     }
 
+    ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
+
     ctx.fill();
     ctx.stroke();
     ctx.closePath();
   }
-
-  var monster = [];
-
-  for (var id in monsters) {
-
-    monster = monsters[id];
-
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
-  }
-
-  var thisBullet;
-  for (var bullet in bullets) {
-
-    if (bullets.hasOwnProperty(bullet)) {
-
-      thisBullet = bullets[bullet];
-      if (thisBullet) {
-        updateBullet(thisBullet);
-        thisBullet && (ctx.fillStyle = '#FFFFFF');
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 5, 5));
-      }
-    }
-  }
 }
 
+function colorSprite (ctx, user) {
+
+  var offset = user.facing === 'left' ? 19: 11;
+
+  ctx.fillStyle = user.color;
+  ctx.fillRect(user.x + offset,  user.y + 25, 20, 10); // shirt
+  ctx.fillStyle = user.eyeColor;
+  ctx.fillRect(user.x + offset + 1, user.y + 10, 18, 10); // eyes
+  ctx.fillStyle = user.pantsColor;
+  ctx.fillRect(user.x + offset + 2,  user.y + 35, 16, 5); // pants
+}
 
 function run () {
 

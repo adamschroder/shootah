@@ -89,7 +89,7 @@ function createUser (socket, data) {
     sessionIds[data.id] = socket.id;
   }
   else {
-
+    var eyeColors = ['#422d0f', '#2c92f0', '#43bb45'];
     var id = getUID();
     // create new data
     userData = {
@@ -101,8 +101,10 @@ function createUser (socket, data) {
       'height': 50,
       'speed': 200,
       'color': '#'+Math.floor(Math.random()*16777215).toString(16),
-      'facing':'down',
-      'health': 10
+      'health': 10,
+      'eyeColor': eyeColors[Math.floor(Math.random()*eyeColors.length)],
+      'pantsColor': '#'+Math.floor(Math.random()*16777215).toString(16),
+      'facing':'down'
     };
 
     sessionIds[userData.id] = socket.id;
