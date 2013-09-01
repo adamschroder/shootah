@@ -53,8 +53,6 @@ socket.on('move', function (data) {
 
 socket.on('newBullet', function (data) {
 
-  console.log('new bullet', data);
-
   if (!bullets[data.id]) {
     bullets[data.id] = data;
   }
