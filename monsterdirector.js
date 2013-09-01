@@ -27,6 +27,15 @@ module.exports = (function () {
   //stub
   var numPlayers = 1;
 
+  function updateTarget (data) {
+
+    changeTarget = Math.round(Math.random() * 1);
+    if (changeTarget) {
+      target.x = data.x;
+      target.y = data.y;
+    }
+  }
+
   function moveMonsters () {
 
     var monster;
@@ -58,10 +67,6 @@ module.exports = (function () {
     this.type = 'monster';
     this.height = this.width = 10;
     this.x = this.y = 0;
-
-    // start point: TL, TR, BL, BR
-    // offset path: x or y
-    // offset value: between 0 and (max - 100)
 
     var left = Math.round(Math.random() * 1);
     var top = Math.round(Math.random() * 1);
@@ -114,5 +119,6 @@ module.exports = (function () {
 
   loop();
 
+  self.updateTarget = updateTarget;
   return self;
 })();
