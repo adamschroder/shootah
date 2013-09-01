@@ -1,4 +1,4 @@
-//var socket = io.connect('http://192.168.2.95:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
@@ -9,7 +9,7 @@ canvas.height = 600;
 
 var sessionId, userData;
 var users = {};
-var monsters = [];
+var monsters = {};
 var bullets = [];
 var keysDown = {};
 
@@ -43,7 +43,7 @@ socket.on('move', function (data) {
     mover.x = data.x;
     mover.y = data.y;
   }
-  // console.log(isMonster, data.id)
+
   isMonster && (monsters[data.id] = data);
 });
 
@@ -191,8 +191,13 @@ function render () {
   }
 
   var monster = [];
-  for (var i = 0, max = monsters.length; i < max; i++) {
 
+  for (var id in monsters) {
+
+    monster = monsters[id];
+
+    ctx.fillStyle = '#ffc';
+    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
 }
 

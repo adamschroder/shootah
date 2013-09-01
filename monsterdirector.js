@@ -23,7 +23,7 @@ module.exports = (function () {
 
   function moveMonsters () {
 
-    console.log('MOVE THE MONSTERS');
+    // console.log('MOVE THE MONSTERS');
     var monster;
 
     for (var i = 0, max = monsters.length; i < max; i++) {
@@ -38,7 +38,7 @@ module.exports = (function () {
     var amount = numPlayers * rate;
     var monster;
 
-    console.log('SPAWN NEW MONSTERS');
+    // console.log('SPAWN NEW MONSTERS');
 
     for (var i = 0, max = amount; i < max; i++) {
 
@@ -46,7 +46,9 @@ module.exports = (function () {
       monster = {
         'type': 'monster',
         'x': board.height/2,
-        'y': board.width/2
+        'y': board.width/2,
+        'height': 100,
+        'width': 100
       };
 
       monster.id = monsters.push(monster);
