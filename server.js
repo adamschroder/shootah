@@ -20,20 +20,24 @@ io.sockets.on('connection', function (socket) {
   socket.on('userJoined', function (data) {
 
     var user = createUser(socket, data);
-    socket.emit('join', user);
+    io.sockets.emit('join', user);
+
+    for (var player in users) {
+      if (users[player].id !== user.id) {
+        socket.emit('join', users[player]);
+      }
+    }
   });
 
   socket.on('updateMovement', function (data) {
 
-    console.log(data);
-    socket.broadcast.emit('move', data);
+    io.sockets.emit('move', data);
     users[data.id] = data;
   });
 
   console.log('connection')
   monsterdirector.on('move', function (data) {
-    console.log('asdasd')
-    socket.broadcast.emit('move', data);
+    io.sockets.emit('move', data);
   })
 });
 
@@ -43,7 +47,7 @@ function createUser (socket, data) {
   var userData = {};
   data = data || {};
   // if the user existed sometime before
-  console.log(data.id)
+  console.log('creating user', data.id, sessionIds[data.id]);
   if (sessionIds[data.id]) {
 
     // remap old data
