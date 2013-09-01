@@ -49,6 +49,15 @@ socket.on('move', function (data) {
   isMonster && (monsters[data.id] = data);
 });
 
+socket.on('newBullet', function (data) {
+
+  console.log('new bullet', data);
+
+  if (!bullets[data.id]) {
+    bullets[data.id] = data;
+  }
+});
+
 // key events
 window.addEventListener('keydown', function (e) {
   e.preventDefault();
@@ -243,10 +252,9 @@ function render () {
   }
 }
 
-
 function run () {
 
-  mod = (Date.now() - time) / 1000
+  mod = (Date.now() - time) / 1000;
 
   update();
   render();
