@@ -1,5 +1,5 @@
-var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -19,7 +19,7 @@ var keysDown = {};
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
 }
-catch (e){}
+catch (e) {}
 
 // server events
 
@@ -52,7 +52,7 @@ function updatePositions (list) {
       mover.y = data.y;
     }
 
-    isMonster ? (monsters[data.id] = data) : (mover.facing = data.facing);
+    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
   }
 }
 
@@ -379,11 +379,15 @@ function render () {
 
   var monster;
 
+  monsterImage = new Image();
+  monsterImage.src = 'images/monster-right.png';
+
   for (var id in monsters) {
 
     monster = monsters[id];
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+    // ctx.fillStyle = '#fff';
+    ctx.drawImage(monsterImage, monster.x, monster.y, monster.width*5, monster.height*5);
+    //ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
 
   var thisBullet;
@@ -409,9 +413,9 @@ function render () {
     colorSprite(ctx, users[user]);
 
     // dis is the white line for facing
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = 'white';
     ctx.beginPath();
-    image.src = "images/blank-character-right.png";
+    image.src = 'images/blank-character-right.png';
 
     switch (users[user].facing) {
       case 'up':

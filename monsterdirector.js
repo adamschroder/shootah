@@ -12,7 +12,7 @@ module.exports = (function () {
   var rate = 3;
   var monsters = {};
   var monsterIds = {};
-  var maxMonsters = 100;
+  var maxMonsters = 25;
   var speed = 1;
   var numPlayers = 1;
 
@@ -58,7 +58,7 @@ module.exports = (function () {
 
     changeTarget = Math.round(Math.random() * 10);
 
-    if (superBadLuck || !badLuckUser && changeTarget === 1) {
+    if (superBadLuck || !badLuckUser && changeTarget === 1 || badLuckUser === data.id) {
       target.x = data.x;
       target.y = data.y;
     }
@@ -95,7 +95,7 @@ module.exports = (function () {
 
     this.type = 'monster';
     this.id = getMonsterId();
-    this.height = this.width = 10;
+    this.height = this.width = 50;
     this.x = this.y = 0;
 
     var left = Math.round(Math.random() * 1);
