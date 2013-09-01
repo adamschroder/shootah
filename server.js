@@ -16,13 +16,10 @@ var users = {};
 
 io.sockets.on('connection', function (socket) {
 
-  var user = createUser(socket);
-
-  socket.emit('join', user);
-
   socket.on('userJoined', function (data) {
 
-    socket.broadcast.emit('userJoined', data);
+    var user = createUser(socket, data);
+    socket.emit('join', user);
   });
 
   socket.on('updateMovement', function (data) {
@@ -37,7 +34,7 @@ function createUser (socket, data) {
   var userData = {};
   data = data || {};
   // if the user existed sometime before
-
+  console.log(data.id)
   if (sessionIds[data.id]) {
 
     // remap old data
