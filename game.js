@@ -19,7 +19,7 @@ var keysDown = {};
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
 }
-catch (e){}
+catch (e) {}
 
 // server events
 
