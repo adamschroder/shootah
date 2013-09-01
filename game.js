@@ -11,15 +11,15 @@ var scoreCtx = scoreCanvas.getContext('2d');
 scoreCanvas.width = 800;
 scoreCanvas.height = 100;
 
-var mod;
-var sessionId, userData;
-var userId;
+var mod, sessionId, userData, userId;
 var users = {};
 var bullets = {};
 var ids = [];
 var monsters = {};
 var keysDown = {};
 var scores = {};
+
+var time = Date.now();
 
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
@@ -165,29 +165,31 @@ function update () {
   }
 
   // movement
-  var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
-  var movement = false;
-  if (65 in keysDown && checkBounds()) { // left
+  if (checkBounds()) {
+    var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
+    var movement = false;
+    if (65 in keysDown) { // left
 
-    userData.x -= offset;
-    movement = true;
-  }
-  else if (87 in keysDown && checkBounds()) { // down
+      userData.x -= offset;
+      movement = true;
+    }
+    if (87 in keysDown) { // down
 
-    userData.y -= offset;
-    movement = true;
-  }
-  else if (68 in keysDown && checkBounds()) { // right
+      userData.y -= offset;
+      movement = true;
+    }
+    if (68 in keysDown) { // right
 
-    userData.x += offset;
-    movement = true;
-  }
-  else if (83 in keysDown && checkBounds()) { // up
+      userData.x += offset;
+      movement = true;
+    }
+    if (83 in keysDown) { // up
 
-   userData.y += offset;
-   movement = true;
+     userData.y += offset;
+     movement = true;
+    }
+    movement && socket.emit('updateMovement', userData);
   }
-  movement && socket.emit('updateMovement', userData);
 
   // aiming
   var aiming = false;
@@ -574,4 +576,3 @@ function run () {
   // loop on next available frame
   window.requestAnimationFrame(run);
 }
-var time = Date.now();
