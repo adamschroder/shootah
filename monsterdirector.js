@@ -8,8 +8,8 @@ module.exports = (function () {
   var self = new events.EventEmitter();
 
   var loopCount = 0;
-  var interval = 10;
-  var rate = 5;
+  var interval = 100;
+  var rate = 3;
   var monsters = [];
   var targetX, targetY;
 
@@ -61,7 +61,7 @@ module.exports = (function () {
     
     moveMonsters();
 
-    if (loopCount === 100) {
+    if (loopCount === 10) {
       loopCount = 0;
       spawnMonsters();
     }
