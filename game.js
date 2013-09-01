@@ -209,6 +209,8 @@ function Bullet (x, y, direction, owner) {
   b.id = owner + getUID();
   b.x = x;
   b.y = y;
+  b.width = 5;
+  b.height = 5;
   b.direction = direction;
   b.speed = 500;
 }
@@ -257,23 +259,26 @@ function updateBullet (b) {
       return;
     }
 
-    // console.log(isInbounds);
-
-
     var user = collidesWithUser(b);
+
+    console.log('collides with user', user);
   }
 }
 
 function doBoxesIntersect (a, b) {
 
-  var ax, ay, bx, by;
-  ax = a.x / a.width;
-  ay = a.y / a.height;
-  bx = b.x / b.width;
-  by = b.y / b.height;
+  var wa = a.width + a.x;
+  var wb = b.width + b.x;
 
-  return (Math.abs(ax - bx) * 2 < (a.width + b.width)) && (Math.abs(ay - by) * 2 < (a.height + b.height));
+  if (b.x > wa || a.x > wb) return false;
+
+  var ha = a.height + a.y;
+  var hb = b.height + b.y;
+  if (b.y > ha || a.y > hb) return false;
+  
+  return true;
 }
+
 
 function collidesWithUser (obj) {
 
