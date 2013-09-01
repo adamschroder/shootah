@@ -61,7 +61,6 @@ window.addEventListener('keyup', function (e) {
 // methods
 function update (mod) {
 
-
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
 
   if (65 in keysDown && checkBounds()) { // left
@@ -83,6 +82,31 @@ function update (mod) {
 
    userData.y += offset;
    socket.emit('updateMovement', userData);
+  }
+
+  // pointing
+  if (38 in keysDown) {
+
+    userData.facing = 'up';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (37 in keysDown) {
+
+    userData.facing = 'left';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (39 in keysDown) {
+
+    userData.facing = 'right';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (40 in keysDown) {
+
+    userData.facing = 'down';
+    socket.emit('updateMovement', userData);
   }
 }
 
