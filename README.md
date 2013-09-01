@@ -21,9 +21,9 @@ technical issues
 ================
 
 where should collision detection occur?
- - both front and backend, but backend decides whether it was a true hit or miss
- - need to do collision detection on front end for animations
- - need to to do collision detection on back end for truth
+ - clients handle collision detection for the player only (his bullets with other players and monsters, collisions with monsters)
+ - collisions are messaged from the client -> server -> all clients ... cloud computed collisions (thumbsup)
+ - later add anti-cheat mechanisms, not needed for first version
 
 
 the more logic put onto the backend, the more code we can use on the client for animations, efx, SOUNDS!!!, etc.
