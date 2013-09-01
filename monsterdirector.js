@@ -11,12 +11,18 @@ module.exports = (function () {
   var interval = 100;
   var rate = 3;
   var monsters = [];
-  var targetX, targetY;
 
   var board = {
     'height': 600,
-    'width': 600
+    'width': 800
   };
+
+  var target = {
+    'x': 400,
+    'y': 300
+  };
+
+  var speed = 10;
 
   //stub
   var numPlayers = 1;
@@ -26,9 +32,55 @@ module.exports = (function () {
     var monster;
 
     for (var i = 0, max = monsters.length; i < max; i++) {
+      
       monster = monsters[i];
-      // calculate movement towards target
-      // emit move event
+      
+      if (monster.x < target.x) {
+        monster.x += speed;
+      }
+      else {
+        monster.x -= speed;
+      }
+
+      if (monster.y < target.y) {
+        monster.y += speed;
+      }
+      else {
+        monster.y -= speed;
+      }
+
+      self.emit('move', monster);
+    }
+  }
+
+  function Monster () {
+
+    this.type = 'monster';
+    this.height = this.width = 10;
+    this.x = this.y = 0;
+
+    // start point: TL, TR, BL, BR
+    // offset path: x or y
+    // offset value: between 0 and (max - 100)
+
+    var left = Math.round(Math.random() * 1);
+    var top = Math.round(Math.random() * 1);
+
+    this.x = left ? 0 : board.width;
+    this.y = top ? 0 : board.height;
+
+    var offsetDirection = !!Math.round(Math.random() * 1) ? 'x': 'y';
+    var offsetAmount;
+
+    if (offsetDirection === 'x') {
+
+      offsetAmount = (Math.round(Math.random() * board.width));
+      this.x = left ? this.x + offsetAmount : this.x - offsetAmount;
+    }
+    else {
+
+      offsetAmount = (Math.round(Math.random() * board.height));
+      this.y = top ? this.y + offsetAmount : this.y - offsetAmount;
     }
   }
 
@@ -37,19 +89,9 @@ module.exports = (function () {
     var amount = numPlayers * rate;
     var monster;
 
-
-    // console.log('SPAWN NEW MONSTERS');
     for (var i = 0, max = amount; i < max; i++) {
 
-      // TODO: make spawn x/y random, to the edges of the board
-      monster = {
-        'type': 'monster',
-        'x': board.height/2,
-        'y': board.width/2,
-        'height': 100,
-        'width': 100
-      };
-
+      monster = new Monster();
       monster.id = monsters.push(monster);
 
       self.emit('move', monster);

@@ -1,5 +1,5 @@
- var socket = io.connect('http://192.168.2.95:8080');
-//var socket = io.connect('http://localhost:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
+var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
@@ -72,6 +72,12 @@ window.addEventListener('keyup', function (e) {
 });
 
 // methods
+
+var canShoot = false;
+var bulletTimer = setInterval(function () {
+  canShoot =  true;
+}, 300);
+
 function update () {
 
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
@@ -122,12 +128,41 @@ function update () {
     socket.emit('updateMovement', userData);
   }
 
+  if (38 in keysDown && 37 in keysDown) {
+
+    userData.facing = 'up-left';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (40 in keysDown && 37 in keysDown) {
+
+    userData.facing = 'down-left';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (38 in keysDown && 39 in keysDown) {
+
+    userData.facing = 'up-right';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (40 in keysDown && 39 in keysDown) {
+
+    userData.facing = 'down-right';
+    socket.emit('updateMovement', userData);
+  }
+
   // space
   if (32 in keysDown) {
 
-    var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
-    bullets[bullet.id] = bullet;
-    socket.emit('newBullet', bullet);
+    if (canShoot) {
+
+      var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
+      bullets[bullet.id] = bullet;
+      socket.emit('newBullet', bullet);
+    }
+
+    canShoot = false;
   }
 }
 
@@ -180,8 +215,24 @@ function updateBullet (b) {
   if (dir === 'up') {
     b.y -= spd * mod;
   }
+  else if (dir === 'up-left') {
+    b.y -= spd * mod;
+    b.x -= spd * mod;
+  }
+  else if (dir === 'up-right') {
+    b.y -= spd * mod;
+    b.x += spd * mod;
+  }
   else if (dir === 'down') {
     b.y += spd * mod;
+  }
+  else if (dir === 'down-left') {
+    b.y += spd * mod;
+    b.x -= spd * mod;
+  }
+  else if (dir === 'down-right') {
+    b.y += spd * mod;
+    b.x += spd * mod;
   }
   else if (dir === 'left') {
     b.x -= spd * mod;
@@ -263,10 +314,18 @@ function render () {
         ctx.moveTo(users[user].x, users[user].y - 5);
         ctx.lineTo(users[user].x + 50, users[user].y - 5);
       break
+      case 'up-left':
+        ctx.moveTo(users[user].x - 25, users[user].y + 20);
+        ctx.lineTo(users[user].x + 20, users[user].y - 25);
+      break;
       case 'down':
         ctx.moveTo(users[user].x , users[user].y + 55);
         ctx.lineTo(users[user].x + 50, users[user].y + 55);
       break
+      case 'down-left':
+        ctx.moveTo(users[user].x - 30, users[user].y + 35);
+        ctx.lineTo(users[user].x + 25, users[user].y + 70);
+      break;
       case 'left':
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
@@ -274,7 +333,15 @@ function render () {
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
-      break
+      break;
+      case 'up-right':
+        ctx.moveTo(users[user].x + 75, users[user].y + 20);
+        ctx.lineTo(users[user].x + 25, users[user].y - 25);
+      break;
+      case 'down-right':
+        ctx.moveTo(users[user].x + 70, users[user].y + 25);
+        ctx.lineTo(users[user].x + 35, users[user].y + 70);
+      break;
     }
 
     ctx.fill();
@@ -288,7 +355,7 @@ function render () {
 
     monster = monsters[id];
 
-    ctx.fillStyle = '#ffc';
+    ctx.fillStyle = '#fff';
     ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
   }
 
@@ -301,7 +368,7 @@ function render () {
       if (thisBullet) {
         updateBullet(thisBullet);
         thisBullet && (ctx.fillStyle = '#FFFFFF');
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 1, 1));
+        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 5, 5));
       }
     }
   }
@@ -320,6 +387,5 @@ function run () {
 }
 
 var time = Date.now();
-
 // start on next available frame
 window.requestAnimationFrame(run);
