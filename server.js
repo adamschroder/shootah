@@ -27,6 +27,7 @@ io.sockets.on('connection', function (socket) {
 
     console.log(data);
     socket.broadcast.emit('move', data);
+    users[data.id] = data;
   });
 
   console.log('connection')
