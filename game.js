@@ -31,10 +31,10 @@ socket.on('join', function (data) {
   if (data.socketId === sessionId) {
 
     window.localStorage.setItem('user', JSON.stringify(data));
+    userData = data;
   }
 
   users[data.id] = data;
-  userData = data;
 
   // create the others on the board
 });
