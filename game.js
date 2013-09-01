@@ -47,19 +47,20 @@ socket.on('join', function (data) {
 
 function updatePositions (list) {
 
-  var data;
+  var data, id;
 
   for (var key in list) {
     data = list[key];
+    id = data.id;
 
     var isMonster = data.type === 'monster';
-    var mover = isMonster ? monsters[data.id] : users[data.id];
-    if (mover && data.id !== userData.id) {
+    var mover = isMonster ? monsters[id] : users[id];
+    if (mover && id !== userData.id) {
       mover.x = data.x;
       mover.y = data.y;
     }
 
-    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
+    isMonster ? (monsters[id] = data) : mover && (mover.facing = data.facing);
   }
 }
 
@@ -161,75 +162,68 @@ function update () {
     return;
   }
 
+  // movement
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
-
   if (65 in keysDown && checkBounds()) { // left
 
     userData.x -= offset;
     socket.emit('updateMovement', userData);
   }
-  if (87 in keysDown && checkBounds()) { // down
+  else if (87 in keysDown && checkBounds()) { // down
 
     userData.y -= offset;
     socket.emit('updateMovement', userData);
   }
-  if (68 in keysDown && checkBounds()) { // right
+  else if (68 in keysDown && checkBounds()) { // right
 
     userData.x += offset;
     socket.emit('updateMovement', userData);
   }
-  if (83 in keysDown && checkBounds()) { // up
+  else if (83 in keysDown && checkBounds()) { // up
 
    userData.y += offset;
    socket.emit('updateMovement', userData);
   }
 
-  // pointing
-  if (38 in keysDown) {
-
-    userData.facing = 'up';
-    socket.emit('updateMovement', userData);
-  }
-
-  if (37 in keysDown) {
-
-    userData.facing = 'left';
-    socket.emit('updateMovement', userData);
-  }
-
-  if (39 in keysDown) {
-
-    userData.facing = 'right';
-    socket.emit('updateMovement', userData);
-  }
-
-  if (40 in keysDown) {
-
-    userData.facing = 'down';
-    socket.emit('updateMovement', userData);
-  }
-
+  // aiming
   if (38 in keysDown && 37 in keysDown) {
 
     userData.facing = 'up-left';
     socket.emit('updateMovement', userData);
   }
-
-  if (40 in keysDown && 37 in keysDown) {
+  else if (40 in keysDown && 37 in keysDown) {
 
     userData.facing = 'down-left';
     socket.emit('updateMovement', userData);
   }
-
-  if (38 in keysDown && 39 in keysDown) {
+  else if (38 in keysDown && 39 in keysDown) {
 
     userData.facing = 'up-right';
     socket.emit('updateMovement', userData);
   }
-
-  if (40 in keysDown && 39 in keysDown) {
+  else if (40 in keysDown && 39 in keysDown) {
 
     userData.facing = 'down-right';
+    socket.emit('updateMovement', userData);
+  }
+  else if (38 in keysDown) {
+
+    userData.facing = 'up';
+    socket.emit('updateMovement', userData);
+  }
+  else if (37 in keysDown) {
+
+    userData.facing = 'left';
+    socket.emit('updateMovement', userData);
+  }
+  else if (39 in keysDown) {
+
+    userData.facing = 'right';
+    socket.emit('updateMovement', userData);
+  }
+  else if (40 in keysDown) {
+
+    userData.facing = 'down';
     socket.emit('updateMovement', userData);
   }
 
