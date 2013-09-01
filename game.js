@@ -308,10 +308,13 @@ function render () {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  image = new Image();
+
+
   for (var user in users) {
 
     ctx.fillStyle = users[user].color;
-    ctx.fillRect(users[user].x, users[user].y, users[user].width, users[user].height);
+    ctx.fillRect(users[user].x, users[user].y, 20, 30);
     ctx.strokeStyle = "white";
     ctx.beginPath();
 
@@ -335,10 +338,14 @@ function render () {
       case 'left':
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
+        image.src = "images/character-left.png";
+        ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
       break
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
+        image.src = "images/character.png";
+        ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
       break;
       case 'up-right':
         ctx.moveTo(users[user].x + 75, users[user].y + 20);
@@ -379,6 +386,7 @@ function render () {
     }
   }
 }
+
 
 function run () {
 

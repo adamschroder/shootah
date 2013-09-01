@@ -41,6 +41,7 @@ io.sockets.on('connection', function (socket) {
 
     io.sockets.emit('move', data);
     users[data.socketId] = data;
+    monsterdirector.updateTarget(data);
   });
 
   socket.on('newBullet', function (bullet) {
