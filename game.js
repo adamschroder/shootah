@@ -1,4 +1,4 @@
-// var socket = io.connect('http://192.168.2.95:8080');
+//var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
@@ -10,10 +10,10 @@ canvas.height = 600;
 var sessionId, userData;
 var users = {};
 var monsters = {};
+var bullets = [];
 var keysDown = {};
 
 try {
-
   userData = JSON.parse(window.localStorage.getItem('user'));
 }
 catch (e){}
@@ -25,9 +25,6 @@ socket.emit('userJoined', userData);
 socket.on('join', function (data) {
 
   sessionId = socket.socket.sessionid;
-
-  console.log('join', sessionId);
-
   if (data.socketId === sessionId) {
 
     window.localStorage.setItem('user', JSON.stringify(data));
@@ -35,8 +32,6 @@ socket.on('join', function (data) {
   }
 
   users[data.id] = data;
-
-  // create the others on the board
 });
 
 
@@ -53,7 +48,6 @@ socket.on('move', function (data) {
 });
 
 // key events
-
 window.addEventListener('keydown', function (e) {
 
   keysDown[e.keyCode] = true;
@@ -65,31 +59,61 @@ window.addEventListener('keyup', function (e) {
 });
 
 // methods
-
 function update (mod) {
-
 
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
 
-  if (37 in keysDown && checkBounds()) {
+  if (65 in keysDown && checkBounds()) { // left
 
     userData.x -= offset;
     socket.emit('updateMovement', userData);
   }
-  if (38 in keysDown && checkBounds()) {
+  if (87 in keysDown && checkBounds()) { // down
 
     userData.y -= offset;
     socket.emit('updateMovement', userData);
   }
-  if (39 in keysDown && checkBounds()) {
+  if (68 in keysDown && checkBounds()) { // right
 
     userData.x += offset;
     socket.emit('updateMovement', userData);
   }
-  if (40 in keysDown && checkBounds()) {
+  if (83 in keysDown && checkBounds()) { // up
 
    userData.y += offset;
    socket.emit('updateMovement', userData);
+  }
+
+  // pointing
+  if (38 in keysDown) {
+
+    userData.facing = 'up';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (37 in keysDown) {
+
+    userData.facing = 'left';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (39 in keysDown) {
+
+    userData.facing = 'right';
+    socket.emit('updateMovement', userData);
+  }
+
+  if (40 in keysDown) {
+
+    userData.facing = 'down';
+    socket.emit('updateMovement', userData);
+  }
+
+  // space
+  if (32 in keysDown) {
+
+    var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
+    console.log(bullet);
   }
 }
 
@@ -114,13 +138,21 @@ function checkBounds () {
   return true;
 }
 
+function Bullet (x, y, direction, owner) {
+
+  this.owner = owner;
+  this.x = x;
+  this.y = y;
+  this.direction = direction;
+  this.speed = 400;
+}
 
 function render () {
 
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (user in users) {
+  for (var user in users) {
 
     if (!users.hasOwnProperty(user)) {
 
