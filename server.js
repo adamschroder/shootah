@@ -32,12 +32,12 @@ io.sockets.on('connection', function (socket) {
   socket.on('updateMovement', function (data) {
 
     io.sockets.emit('move', data);
+    users[data.id] = data;
   });
 
   console.log('connection')
   monsterdirector.on('move', function (data) {
-    console.log('asdasd')
-    socket.broadcast.emit('move', data);
+    io.sockets.emit('move', data);
   })
 });
 
