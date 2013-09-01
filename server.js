@@ -52,7 +52,6 @@ io.sockets.on('connection', function (socket) {
 
     io.sockets.emit('newBullet', bullet);
     bullets[bullet.id] = bullet;
-    console.log('BULLET', bullet);
   });
 
   socket.on('killBullet', function (id) {
@@ -70,15 +69,15 @@ io.sockets.on('connection', function (socket) {
 
     hitUser(data);
   });
+});
 
-  monsterdirector.on('move', function (data) {
-    io.sockets.emit('move', data);
-  });
+monsterdirector.on('move', function (data) {
+  io.sockets.emit('move', data);
+});
 
-  monsterdirector.on('killedMonster', function (id) {
+monsterdirector.on('killedMonster', function (id) {
 
-    io.sockets.emit('killedMonster', id);
-  });
+  io.sockets.emit('killedMonster', id);
 });
 
 function updateUserCount () {
@@ -89,7 +88,9 @@ function updateUserCount () {
 
 function hitUser (data) {
 
-  var user = users[data.id];
+  console.log(sessionIds[data.id], data.id);
+
+  var user = users[sessionIds[data.id]];
   if (user) {
     user.health -= data.damage;
     if (user.health <= 0) {
