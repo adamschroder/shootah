@@ -51,10 +51,9 @@ function updatePositions (list) {
     if (mover && data.id !== userData.id) {
       mover.x = data.x;
       mover.y = data.y;
-      mover.facing = data.facing;
     }
 
-    isMonster && (monsters[data.id] = data);
+    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
   }
 }
 
@@ -98,6 +97,10 @@ socket.on('userDeath', function (id) {
   var user = users[id];
   id !== userId && user && delete users[id];
   // todo animation of user death?
+});
+
+socket.on('updateScore', function (scores) {
+  console.log('scores', scores);
 });
 
 // key events
@@ -255,11 +258,16 @@ function checkBounds () {
     return false;
   }
 
-  if (userData.x >= 750|| userData.y >= 550) {
+  if (userData.x >= 760) {
 
-    userData.x = userData.x - 1;
-    userData.y = userData.y - 1;
+    userData.x = userData.x - 5;
 
+    return false;
+  }
+
+  if (userData.y >= 500) {
+
+    userData.y = 490;
     return false;
   }
 
@@ -315,6 +323,8 @@ function updateBullet (b) {
   // only manage bullet collision for self
   if (b.owner === userId) {
 
+    var shooter = b.owner;
+
     var isInbounds = isOnBoard(b);
 
     if (!isInbounds) {
@@ -328,13 +338,21 @@ function updateBullet (b) {
     if (user) {
       user.health -= 1;
       (user.health <= 0) && (delete users[user.id]);
-      socket.emit('hitUser', {'id': user.id, 'damage': 1});
+      socket.emit('hitUser', {
+        'id': user.id,
+        'damage': 1,
+        'shooter': shooter
+      });
     }
     var monster = collidesWithMonster(b);
     if (monster) {
       monster.health -= 1;
       (monster.health <= 0) && (delete monsters[monster.id]);
-      socket.emit('hitMonster', {'id': monster.id, 'damage': 1});
+      socket.emit('hitMonster', {
+        'id': monster.id,
+        'damage': 1,
+        'shooter': shooter
+      });
     }
 
     if (user || monster) {
@@ -404,7 +422,18 @@ function isOnBoard (obj) {
 
 function render () {
 
-  ctx.fillStyle = '#000';
+  // ctx.fillStyle = '#000';
+
+  var patternImg = new Image()
+  patternImg.onload = function () {
+
+    var pattern = ctx.createPattern(patternImg, 'repeat');
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = pattern;
+    ctx.fill();
+  };
+
+  patternImg.src = 'images/grass3.jpg';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   image = new Image();
 

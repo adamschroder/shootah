@@ -9,12 +9,12 @@ module.exports = (function () {
 
   var loopCount = 0;
   var interval = 10;
-  var rate = 3;
+  var rate = 1;
   var monsters = {};
   var monsterIds = {};
   var maxMonsters = 25;
   var speed = 1;
-  var numPlayers = 1;
+  var userCount = 0;
 
   var board = {
     'height': 600,
@@ -44,6 +44,7 @@ module.exports = (function () {
       if (monster.health <= 0) {
         delete monsters[data.id];
         self.emit('killedMonster', data.id);
+        self.emit('updateScore', data.shooter, 1);
       }
     }
   }
@@ -124,7 +125,7 @@ module.exports = (function () {
 
   function spawnMonsters () {
 
-    var amount = numPlayers * rate;
+    var amount = userCount * rate;
     var monster;
 
     for (var i = 0, max = amount; i < max; i++) {
@@ -140,6 +141,10 @@ module.exports = (function () {
     }
   }
 
+  function updateUserCount (count) {
+    userCount = count;
+  }
+
   function loop () {
 
     loopCount++;
@@ -149,6 +154,12 @@ module.exports = (function () {
     if (loopCount === 100) {
       loopCount = 0;
       spawnMonsters();
+
+      var getsHarder = Math.round(Math.random() * 100) === Math.round(Math.random() * 100);
+
+      if (getsHarder) {
+        rate += 1;
+      }
     }
 
     self.emit('move', monsters);
@@ -160,5 +171,6 @@ module.exports = (function () {
 
   self.updateTarget = updateTarget;
   self.damageMonster = damageMonster;
+  self.updateUserCount = updateUserCount;
   return self;
 })();

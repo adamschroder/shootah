@@ -16,6 +16,7 @@ var userIds = {};
 var sessionIds = {}; // sessionIds[id] returns old socket id, from socket id should look up old data
 var users = {};
 var bullets = {};
+var scoreBoard = {};
 
 io.sockets.on('connection', function (socket) {
 
@@ -30,6 +31,8 @@ io.sockets.on('connection', function (socket) {
         socket.emit('join', users[player]);
       }
     }
+
+    updateUserCount();
 
     for (var bullet in bullets) {
 
@@ -75,9 +78,23 @@ monsterdirector.on('move', function (data) {
 });
 
 monsterdirector.on('killedMonster', function (id) {
-
   io.sockets.emit('killedMonster', id);
 });
+
+monsterdirector.on('updateScore', function (user, score) {
+  if (!scoreBoard[user]) {
+    scoreBoard[user] = 0;
+  }
+  scoreBoard[user] += score;
+
+  io.sockets.emit('updateScore', scoreBoard);
+});
+
+function updateUserCount () {
+
+  var count = Object.keys(users).length;
+  monsterdirector.updateUserCount(count);
+}
 
 function hitUser (data) {
 
@@ -89,6 +106,8 @@ function hitUser (data) {
     if (user.health <= 0) {
       user.isDead = true;
       io.sockets.emit('userDeath', user.id);
+
+      updateUserCount();
     }
     else {
       io.sockets.emit('userDamaged', {
