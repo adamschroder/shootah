@@ -120,6 +120,7 @@ module.exports = (function () {
     }
 
     this.health = 1;
+    this.damage = 2;
   }
 
   function spawnMonsters () {
