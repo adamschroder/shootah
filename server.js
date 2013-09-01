@@ -124,7 +124,7 @@ function hitUser (data) {
 function createUser (socket, data) {
 
   var userData = {};
-  var sessionId = sessionIds[data.id];
+  var sessionId = data && sessionIds[data.id];
   data = data || {};
   // if the user existed sometime before
   console.log('creating user', data.id, sessionIds[data.id]);

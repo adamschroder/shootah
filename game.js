@@ -40,6 +40,8 @@ socket.on('join', function (data) {
     window.localStorage.setItem('user', JSON.stringify(data));
     userData = data;
     userId = data.id;
+    // start on next available frame
+    window.requestAnimationFrame(run);
   }
 
   users[data.id] = data;
@@ -427,6 +429,22 @@ function isOnBoard (obj) {
   return true;
 }
 
+// load images (KEEP THIS OUT OF THE RENDER LOOP OMG!)
+var patternImg = new Image();
+var pattern;
+patternImg.onload = function () {
+
+  pattern = ctx.createPattern(patternImg, 'repeat');
+};
+patternImg.src = 'images/grass3.jpg';
+
+var monsterImage = new Image();
+monsterImage.src = 'images/monster-right.png';
+
+var image = new Image();
+
+
+// DO NOT CREATE OBJECTS IN HERE!
 function render () {
 
   scoreCtx.fillStyle = '#f00';
@@ -434,26 +452,17 @@ function render () {
 
   // ctx.fillStyle = '#000';
 
-  var patternImg = new Image()
-  patternImg.onload = function () {
-
-    var pattern = ctx.createPattern(patternImg, 'repeat');
+  // BG
+  if (pattern) {
     ctx.rect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = pattern;
     ctx.fill();
-  };
-
-  patternImg.src = 'images/grass3.jpg';
+  }
+  
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  image = new Image();
-
+  
   var monster;
-
-  monsterImage = new Image();
-  monsterImage.src = 'images/monster-right.png';
-
   for (var id in monsters) {
-
     monster = monsters[id];
     // ctx.fillStyle = '#fff';
     ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
@@ -568,7 +577,4 @@ function run () {
   // loop on next available frame
   window.requestAnimationFrame(run);
 }
-
 var time = Date.now();
-// start on next available frame
-window.requestAnimationFrame(run);
