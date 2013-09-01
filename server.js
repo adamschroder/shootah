@@ -124,15 +124,16 @@ function hitUser (data) {
 function createUser (socket, data) {
 
   var userData = {};
+  var sessionId = sessionIds[data.id];
   data = data || {};
   // if the user existed sometime before
   console.log('creating user', data.id, sessionIds[data.id]);
-  if (sessionIds[data.id]) {
+  if (sessionId) {
 
     // remap old data
-    userData = users[sessionIds[data.id]];
+    userData = users[sessionId];
     userData.isDead = false;
-    userData.health = 10;
+    userData.health = data.health || 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
   }

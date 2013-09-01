@@ -493,7 +493,7 @@ function render () {
       case 'up':
         ctx.moveTo(users[user].x, users[user].y - 5);
         ctx.lineTo(users[user].x + 50, users[user].y - 5);
-      break
+      break;
       case 'up-left':
         ctx.moveTo(users[user].x - 25, users[user].y + 20);
         ctx.lineTo(users[user].x + 20, users[user].y - 25);
@@ -501,7 +501,7 @@ function render () {
       case 'down':
         ctx.moveTo(users[user].x , users[user].y + 55);
         ctx.lineTo(users[user].x + 50, users[user].y + 55);
-      break
+      break;
       case 'down-left':
         ctx.moveTo(users[user].x - 30, users[user].y + 35);
         ctx.lineTo(users[user].x + 25, users[user].y + 70);
@@ -510,8 +510,7 @@ function render () {
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
         image.src = "images/blank-character-left.png";
-        ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
-      break
+      break;
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
