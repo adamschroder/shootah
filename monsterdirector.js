@@ -5,6 +5,7 @@
 module.exports = (function () {
 
   var interval = 1000;
+  var rate = 5;
   var targetX, targetY;
 
   //stub
@@ -12,7 +13,12 @@ module.exports = (function () {
 
   function spawnMonsters () {
 
+    var amount = numPlayers * rate;
+    var monster;
 
+    for (var i = 0, max = amount; i < max; i++) {
+
+    }
   }
   
   function loop () {
