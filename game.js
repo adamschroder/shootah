@@ -1,4 +1,6 @@
+// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
@@ -94,6 +96,10 @@ socket.on('userDeath', function (id) {
   var user = users[id];
   user && delete users[id];
   // todo animation of user death?
+});
+
+socket.on('updateScore', function (scores) {
+  console.log('scores', scores);
 });
 
 // key events
@@ -287,6 +293,8 @@ function updateBullet (b) {
   // only manage bullet collision for self
   if (b.owner === userId) {
 
+    var shooter = b.owner;
+
     var isInbounds = isOnBoard(b);
 
     if (!isInbounds) {
@@ -300,13 +308,21 @@ function updateBullet (b) {
     if (user) {
       user.health -= 1;
       (user.health <= 0) && (delete users[user.id]);
-      socket.emit('hitUser', {'id': user.id, 'damage': 1});
+      socket.emit('hitUser', {
+        'id': user.id,
+        'damage': 1,
+        'shooter': shooter
+      });
     }
     var monster = collidesWithMonster(b);
     if (monster) {
       monster.health -= 1;
       (monster.health <= 0) && (delete monsters[monster.id]);
-      socket.emit('hitMonster', {'id': monster.id, 'damage': 1});
+      socket.emit('hitMonster', {
+        'id': monster.id,
+        'damage': 1,
+        'shooter': shooter
+      });
     }
 
     if (user || monster) {

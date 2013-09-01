@@ -44,6 +44,7 @@ module.exports = (function () {
       if (monster.health <= 0) {
         delete monsters[data.id];
         self.emit('killedMonster', data.id);
+        self.emit('updateScore', data.shooter, 1);
       }
     }
   }
@@ -154,7 +155,7 @@ module.exports = (function () {
       spawnMonsters();
 
       var getsHarder = Math.round(Math.random() * 100) === Math.round(Math.random() * 100);
-      
+
       if (getsHarder) {
         rate += 1;
       }
