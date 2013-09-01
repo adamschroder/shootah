@@ -11,6 +11,7 @@ module.exports = (function () {
   var interval = 10;
   var rate = 3;
   var monsters = [];
+  var maxMonsters = 100;
 
   var board = {
     'height': 600,
@@ -95,6 +96,10 @@ module.exports = (function () {
     var monster;
 
     for (var i = 0, max = amount; i < max; i++) {
+
+      if (monsters.length >= maxMonsters) {
+        return false;
+      }
 
       monster = new Monster();
       monster.id = monsters.push(monster);
