@@ -60,6 +60,11 @@ socket.on('newBullet', function (data) {
   }
 });
 
+socket.on('killBullet', function (id) {
+
+  bullets[id] && (delete bullets[id]);
+});
+
 // key events
 window.addEventListener('keydown', function (e) {
   e.preventDefault();
@@ -247,7 +252,8 @@ function updateBullet (b) {
 
     if (!isInbounds) {
 
-      bullets[b.id] = undefined;
+      delete bullets[b.id];
+      socket.emit('killBullet', b.id);
       return;
     }
 
