@@ -70,6 +70,12 @@ window.addEventListener('keyup', function (e) {
 });
 
 // methods
+
+var canShoot = false;
+var bulletTimer = setInterval(function () {
+  canShoot =  true;
+}, 300);
+
 function update () {
 
   var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
@@ -123,9 +129,14 @@ function update () {
   // space
   if (32 in keysDown) {
 
-    var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
-    bullets[bullet.id] = bullet;
-    socket.emit('newBullet', bullet);
+    if (canShoot) {
+
+      var bullet = new Bullet(userData.x, userData.y, userData.facing, userData.id);
+      bullets[bullet.id] = bullet;
+      socket.emit('newBullet', bullet);
+    }
+
+    canShoot = false;
   }
 }
 
@@ -244,7 +255,7 @@ function render () {
       thisBullet = bullets[bullet];
       updateBullet(thisBullet);
       ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(thisBullet.x, thisBullet.y, 1, 1);
+      ctx.fillRect(thisBullet.x, thisBullet.y, 5, 5);
     }
   }
 }
@@ -262,6 +273,5 @@ function run () {
 }
 
 var time = Date.now();
-
 // start on next available frame
 window.requestAnimationFrame(run);
