@@ -296,7 +296,7 @@ function updateBullet (b) {
     var user = collidesWithUser(b);
     if (user) {
       user.health -= 1;
-      (monster.health <= 0) && (delete users[user.id]);
+      (user.health <= 0) && (delete users[user.id]);
       socket.emit('hitUser', {'id': user.id, 'damage': 1});
     }
     var monster = collidesWithMonster(b);
