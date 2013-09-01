@@ -1,4 +1,5 @@
 var io = require('socket.io').listen(8080);
+var monsterdirector = require('./monsterdirector');
 
 io.set("origins = *");
   io.set('transports', [
