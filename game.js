@@ -376,7 +376,18 @@ function isOnBoard (obj) {
 
 function render () {
 
-  ctx.fillStyle = '#000';
+  // ctx.fillStyle = '#000';
+
+  var patternImg = new Image()
+  patternImg.onload = function () {
+
+    var pattern = ctx.createPattern(patternImg, 'repeat');
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = pattern;
+    ctx.fill();
+  };
+
+  patternImg.src = 'images/grass3.jpg';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   image = new Image();
 
