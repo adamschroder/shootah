@@ -447,7 +447,91 @@ rightImage.src = 'images/blank-character-right.png';
 var leftImage = new Img();
 leftImage.src = "images/blank-character-left.png";
 
+
 // DO NOT CREATE OBJECTS IN HERE!
+function renderEntities (ctx) {
+  var allEntities = [];
+  for (var user in users) {
+    allEntities.push(users[user]);
+  }
+  for (var monster in monsters) {
+    allEntities.push(monsters[monster]);
+  }
+
+  allEntities.sort(function (a, b) {
+
+    return a.y > b.y ? 1 : a.y < b.y ? -1 : 0;
+  });
+
+  for (var i=0, len = allEntities.length; i < len; i++) {
+
+    if (allEntities[i].type === 'player') {
+      renderPlayer(ctx, allEntities[i]);
+    }
+    else if (allEntities[i].type === 'monster') {
+      renderMonster(ctx, allEntities[i]);
+    }
+  }
+}
+
+function renderPlayer(ctx, player) {
+
+  var img;
+  colorSprite(ctx, player);
+
+  // dis is the white line for facing
+  ctx.strokeStyle = 'white';
+  ctx.beginPath();
+  img = rightImage;
+
+  switch (player.facing) {
+    case 'up':
+      ctx.moveTo(player.x, player.y - 5);
+      ctx.lineTo(player.x + 50, player.y - 5);
+    break;
+    case 'up-left':
+      ctx.moveTo(player.x - 25, player.y + 20);
+      ctx.lineTo(player.x + 20, player.y - 25);
+    break;
+    case 'down':
+      ctx.moveTo(player.x , player.y + 55);
+      ctx.lineTo(player.x + 50, player.y + 55);
+    break;
+    case 'down-left':
+      ctx.moveTo(player.x - 30, player.y + 35);
+      ctx.lineTo(player.x + 25, player.y + 70);
+    break;
+    case 'left':
+      ctx.moveTo(player.x - 5, player.y);
+      ctx.lineTo(player.x - 5, player.y + 50);
+      img = leftImage;
+    break;
+    case 'right':
+      ctx.moveTo(player.x + 55, player.y);
+      ctx.lineTo(player.x + 55, player.y + 50);
+      img = rightImage;
+    break;
+    case 'up-right':
+      ctx.moveTo(player.x + 75, player.y + 20);
+      ctx.lineTo(player.x + 25, player.y - 25);
+    break;
+    case 'down-right':
+      ctx.moveTo(player.x + 70, player.y + 25);
+      ctx.lineTo(player.x + 35, player.y + 70);
+    break;
+  }
+
+  ctx.drawImage(img, player.x, player.y, 50, 50);
+
+  ctx.fill();
+  ctx.stroke();
+  ctx.closePath();
+}
+
+function renderMonster (ctx, monster) {
+  ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
+}
+
 function render () {
 
   scoreCtx.fillStyle = '#f00';
@@ -463,14 +547,8 @@ function render () {
   }
   
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  var monster;
-  for (var id in monsters) {
-    monster = monsters[id];
-    // ctx.fillStyle = '#fff';
-    ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
-    //ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
-  }
+
+  renderEntities(ctx);
 
   var thisBullet;
   for (var bullet in bullets) {
@@ -485,60 +563,6 @@ function render () {
       thisBullet && (ctx.fillStyle = '#f2b830');
       thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
     }
-  }
-
-  var img;
-  for (var user in users) {
-
-    colorSprite(ctx, users[user]);
-
-    // dis is the white line for facing
-    ctx.strokeStyle = 'white';
-    ctx.beginPath();
-    img = rightImage;
-
-    switch (users[user].facing) {
-      case 'up':
-        ctx.moveTo(users[user].x, users[user].y - 5);
-        ctx.lineTo(users[user].x + 50, users[user].y - 5);
-      break;
-      case 'up-left':
-        ctx.moveTo(users[user].x - 25, users[user].y + 20);
-        ctx.lineTo(users[user].x + 20, users[user].y - 25);
-      break;
-      case 'down':
-        ctx.moveTo(users[user].x , users[user].y + 55);
-        ctx.lineTo(users[user].x + 50, users[user].y + 55);
-      break;
-      case 'down-left':
-        ctx.moveTo(users[user].x - 30, users[user].y + 35);
-        ctx.lineTo(users[user].x + 25, users[user].y + 70);
-      break;
-      case 'left':
-        ctx.moveTo(users[user].x - 5, users[user].y);
-        ctx.lineTo(users[user].x - 5, users[user].y + 50);
-        img = leftImage;
-      break;
-      case 'right':
-        ctx.moveTo(users[user].x + 55, users[user].y);
-        ctx.lineTo(users[user].x + 55, users[user].y + 50);
-        img = rightImage;
-      break;
-      case 'up-right':
-        ctx.moveTo(users[user].x + 75, users[user].y + 20);
-        ctx.lineTo(users[user].x + 25, users[user].y - 25);
-      break;
-      case 'down-right':
-        ctx.moveTo(users[user].x + 70, users[user].y + 25);
-        ctx.lineTo(users[user].x + 35, users[user].y + 70);
-      break;
-    }
-
-    ctx.drawImage(img, users[user].x, users[user].y, 50, 50);
-
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
   }
 
   var offset = 0;

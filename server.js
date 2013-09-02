@@ -18,6 +18,9 @@ var users = {};
 var bullets = {};
 var scoreBoard = {};
 
+var rnd = Math.random;
+var floor = Math.floor;
+
 io.sockets.on('connection', function (socket) {
 
   socket.on('userJoined', function (data) {
@@ -136,16 +139,17 @@ function createUser (socket, data) {
     // create new data
     userData = {
       'id': id,
+      'type': 'player',
       'socketId': socket.id,
-      'x': Math.random()*200,
-      'y': Math.random()*200,
+      'x': rnd()*200,
+      'y': rnd()*200,
       'width': 50,
       'height': 50,
       'speed': 200,
-      'color': '#'+Math.floor(Math.random()*16777215).toString(16),
+      'color': '#'+floor(rnd()*16777215).toString(16),
       'health': 10,
-      'eyeColor': eyeColors[Math.floor(Math.random()*eyeColors.length)],
-      'pantsColor': '#'+Math.floor(Math.random()*16777215).toString(16),
+      'eyeColor': eyeColors[floor(rnd()*eyeColors.length)],
+      'pantsColor': '#'+floor(rnd()*16777215).toString(16),
       'facing':'down'
     };
 
@@ -159,9 +163,9 @@ function createUser (socket, data) {
 
 function getUID () {
 
-  var id = Math.random();
+  var id = rnd();
   while (sessionIds[id]) {
-    id = Math.random();
+    id = rnd();
   }
   return id;
 }
