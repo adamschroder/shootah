@@ -35,7 +35,6 @@ io.sockets.on('connection', function (socket) {
     updateUserCount();
 
     for (var bullet in bullets) {
-
       if (bullets[bullet].owner !== user.id) {
         socket.emit('newBullet', bullets[bullet]);
       }
@@ -50,7 +49,6 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('newBullet', function (bullet) {
-
 
     io.sockets.emit('newBullet', bullet);
     bullets[bullet.id] = bullet;
@@ -99,15 +97,12 @@ function updateUserCount () {
 
 function hitUser (data) {
 
-  console.log('hitUser', sessionIds[data.id], data.id);
-
   var user = users[sessionIds[data.id]];
   if (user) {
     user.health -= data.damage;
     if (user.health <= 0) {
       user.isDead = true;
       io.sockets.emit('userDeath', user.id);
-
       updateUserCount();
     }
     else {
@@ -117,21 +112,21 @@ function hitUser (data) {
       });
     }
   }
-
 }
 
 
 function createUser (socket, data) {
 
   var userData = {};
+  var sessionId = data && sessionIds[data.id];
   data = data || {};
   // if the user existed sometime before
-  console.log('creating user', data.id, sessionIds[data.id]);
-  if (sessionIds[data.id]) {
+  if (sessionId) {
 
     // remap old data
-    userData = users[sessionIds[data.id]];
+    userData = users[sessionId];
     userData.isDead = false;
+    userData.health = data.health || 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
   }
@@ -159,7 +154,6 @@ function createUser (socket, data) {
 
   // keep a map of the users data
   users[userData.socketId] = userData;
-
   return userData;
 }
 

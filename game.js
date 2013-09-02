@@ -11,15 +11,15 @@ var scoreCtx = scoreCanvas.getContext('2d');
 scoreCanvas.width = 800;
 scoreCanvas.height = 100;
 
-var mod;
-var sessionId, userData;
-var userId;
+var mod, sessionId, userData, userId;
 var users = {};
 var bullets = {};
 var ids = [];
 var monsters = {};
 var keysDown = {};
 var scores = {};
+
+var time = Date.now();
 
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
@@ -40,6 +40,8 @@ socket.on('join', function (data) {
     window.localStorage.setItem('user', JSON.stringify(data));
     userData = data;
     userId = data.id;
+    // start on next available frame
+    window.requestAnimationFrame(run);
   }
 
   users[data.id] = data;
@@ -47,19 +49,20 @@ socket.on('join', function (data) {
 
 function updatePositions (list) {
 
-  var data;
+  var data, id, monster, mover;
 
   for (var key in list) {
     data = list[key];
+    id = data.id;
 
-    var isMonster = data.type === 'monster';
-    var mover = isMonster ? monsters[data.id] : users[data.id];
-    if (mover && data.id !== userData.id) {
+    isMonster = data.type === 'monster';
+    mover = isMonster ? monsters[id] : users[id];
+    if (mover && id !== userData.id) {
       mover.x = data.x;
       mover.y = data.y;
     }
 
-    isMonster ? (monsters[data.id] = data) : mover && (mover.facing = data.facing);
+    isMonster ? (monsters[id] = data) : mover && (mover.facing = data.facing);
   }
 }
 
@@ -131,6 +134,7 @@ var bulletTimer = setInterval(function () {
   canShoot =  true;
 }, 150);
 
+// limit monster damage to ever half second
 var canTakeDamage = true;
 var damageTimer = setInterval(function () {
   canTakeDamage =  true;
@@ -161,77 +165,76 @@ function update () {
     return;
   }
 
-  var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
+  // movement
+  if (checkBounds()) {
+    var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
+    var movement = false;
+    if (65 in keysDown) { // left
 
-  if (65 in keysDown && checkBounds()) { // left
+      userData.x -= offset;
+      movement = true;
+    }
+    if (87 in keysDown) { // down
 
-    userData.x -= offset;
-    socket.emit('updateMovement', userData);
-  }
-  if (87 in keysDown && checkBounds()) { // down
+      userData.y -= offset;
+      movement = true;
+    }
+    if (68 in keysDown) { // right
 
-    userData.y -= offset;
-    socket.emit('updateMovement', userData);
-  }
-  if (68 in keysDown && checkBounds()) { // right
+      userData.x += offset;
+      movement = true;
+    }
+    if (83 in keysDown) { // up
 
-    userData.x += offset;
-    socket.emit('updateMovement', userData);
-  }
-  if (83 in keysDown && checkBounds()) { // up
-
-   userData.y += offset;
-   socket.emit('updateMovement', userData);
-  }
-
-  // pointing
-  if (38 in keysDown) {
-
-    userData.facing = 'up';
-    socket.emit('updateMovement', userData);
+     userData.y += offset;
+     movement = true;
+    }
+    movement && socket.emit('updateMovement', userData);
   }
 
-  if (37 in keysDown) {
-
-    userData.facing = 'left';
-    socket.emit('updateMovement', userData);
-  }
-
-  if (39 in keysDown) {
-
-    userData.facing = 'right';
-    socket.emit('updateMovement', userData);
-  }
-
-  if (40 in keysDown) {
-
-    userData.facing = 'down';
-    socket.emit('updateMovement', userData);
-  }
-
+  // aiming
+  var aiming = false;
   if (38 in keysDown && 37 in keysDown) {
 
     userData.facing = 'up-left';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
-
-  if (40 in keysDown && 37 in keysDown) {
+  else if (40 in keysDown && 37 in keysDown) {
 
     userData.facing = 'down-left';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
-
-  if (38 in keysDown && 39 in keysDown) {
+  else if (38 in keysDown && 39 in keysDown) {
 
     userData.facing = 'up-right';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
-
-  if (40 in keysDown && 39 in keysDown) {
+  else if (40 in keysDown && 39 in keysDown) {
 
     userData.facing = 'down-right';
-    socket.emit('updateMovement', userData);
+    aiming = true;
   }
+  else if (38 in keysDown) {
+
+    userData.facing = 'up';
+    aiming = true;
+  }
+  else if (37 in keysDown) {
+
+    userData.facing = 'left';
+    aiming = true;
+  }
+  else if (39 in keysDown) {
+
+    userData.facing = 'right';
+    aiming = true;
+  }
+  else if (40 in keysDown) {
+
+    userData.facing = 'down';
+    aiming = true;
+  }
+  aiming && socket.emit('updateMovement', userData);
 
   // space
   if (32 in keysDown) {
@@ -270,7 +273,6 @@ function checkBounds () {
   if (userData.x >= 760) {
 
     userData.x = userData.x - 5;
-
     return false;
   }
 
@@ -399,7 +401,6 @@ function collidesWithUser (obj) {
     collide = doBoxesIntersect(obj, thisUser);
 
     if (collide) {
-      console.log('hit', thisUser);
       return thisUser;
     }
   }
@@ -414,7 +415,6 @@ function collidesWithMonster (obj) {
     thisMonster = monsters[monster];
     collide = doBoxesIntersect(obj, thisMonster);
     if (collide) {
-      console.log('hit', thisMonster);
       return thisMonster;
     }
   }
@@ -429,6 +429,25 @@ function isOnBoard (obj) {
   return true;
 }
 
+// load images (KEEP THIS OUT OF THE RENDER LOOP OMG!)
+var Img = Image;
+var patternImg = new Img();
+var pattern;
+patternImg.onload = function () {
+  pattern = ctx.createPattern(patternImg, 'repeat');
+};
+patternImg.src = 'images/grass3.jpg';
+
+var monsterImage = new Img();
+monsterImage.src = 'images/monster-right.png';
+
+var rightImage = new Img();
+rightImage.src = 'images/blank-character-right.png';
+
+var leftImage = new Img();
+leftImage.src = "images/blank-character-left.png";
+
+// DO NOT CREATE OBJECTS IN HERE!
 function render () {
 
   scoreCtx.fillStyle = '#f00';
@@ -436,26 +455,17 @@ function render () {
 
   // ctx.fillStyle = '#000';
 
-  var patternImg = new Image()
-  patternImg.onload = function () {
-
-    var pattern = ctx.createPattern(patternImg, 'repeat');
+  // BG
+  if (pattern) {
     ctx.rect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = pattern;
     ctx.fill();
-  };
-
-  patternImg.src = 'images/grass3.jpg';
+  }
+  
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  image = new Image();
-
+  
   var monster;
-
-  monsterImage = new Image();
-  monsterImage.src = 'images/monster-right.png';
-
   for (var id in monsters) {
-
     monster = monsters[id];
     // ctx.fillStyle = '#fff';
     ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
@@ -465,21 +475,19 @@ function render () {
   var thisBullet;
   for (var bullet in bullets) {
 
-    if (bullets.hasOwnProperty(bullet)) {
+    thisBullet = bullets[bullet];
+    if (thisBullet) {
+      updateBullet(thisBullet);
 
-      thisBullet = bullets[bullet];
-      if (thisBullet) {
-        updateBullet(thisBullet);
+      thisBullet && (ctx.fillStyle = '#d62822');
+      thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
 
-        thisBullet && (ctx.fillStyle = '#d62822');
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
-
-        thisBullet && (ctx.fillStyle = '#f2b830');
-        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
-      }
+      thisBullet && (ctx.fillStyle = '#f2b830');
+      thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
     }
   }
 
+  var img;
   for (var user in users) {
 
     colorSprite(ctx, users[user]);
@@ -487,13 +495,13 @@ function render () {
     // dis is the white line for facing
     ctx.strokeStyle = 'white';
     ctx.beginPath();
-    image.src = 'images/blank-character-right.png';
+    img = rightImage;
 
     switch (users[user].facing) {
       case 'up':
         ctx.moveTo(users[user].x, users[user].y - 5);
         ctx.lineTo(users[user].x + 50, users[user].y - 5);
-      break
+      break;
       case 'up-left':
         ctx.moveTo(users[user].x - 25, users[user].y + 20);
         ctx.lineTo(users[user].x + 20, users[user].y - 25);
@@ -501,7 +509,7 @@ function render () {
       case 'down':
         ctx.moveTo(users[user].x , users[user].y + 55);
         ctx.lineTo(users[user].x + 50, users[user].y + 55);
-      break
+      break;
       case 'down-left':
         ctx.moveTo(users[user].x - 30, users[user].y + 35);
         ctx.lineTo(users[user].x + 25, users[user].y + 70);
@@ -509,13 +517,12 @@ function render () {
       case 'left':
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
-        image.src = "images/blank-character-left.png";
-        ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
-      break
+        img = leftImage;
+      break;
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
-        image.src = "images/blank-character-right.png";
+        img = rightImage;
       break;
       case 'up-right':
         ctx.moveTo(users[user].x + 75, users[user].y + 20);
@@ -527,7 +534,7 @@ function render () {
       break;
     }
 
-    ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
+    ctx.drawImage(img, users[user].x, users[user].y, 50, 50);
 
     ctx.fill();
     ctx.stroke();
@@ -535,12 +542,12 @@ function render () {
   }
 
   var offset = 0;
-  image.src = 'images/blank-character-right.png';
+  img = rightImage;
 
   for (var player in scores) {
     scoreCtx.font = "30px Arial";
     scoreCtx.fillText('' + scores[player], 25, 0);
-    scoreCtx.drawImage(image, offset, 0, 50, 50);
+    scoreCtx.drawImage(img, offset, 0, 50, 50);
     
     // offset += 50;
     // console.log('SCR', player, scores[player])
@@ -571,7 +578,3 @@ function run () {
   // loop on next available frame
   window.requestAnimationFrame(run);
 }
-
-var time = Date.now();
-// start on next available frame
-window.requestAnimationFrame(run);
