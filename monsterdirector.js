@@ -136,9 +136,9 @@ module.exports = (function () {
 
       monster = new Monster();
       monsters[monster.id] = monster;
-
-      self.emit('move', monster);
     }
+
+    self.emit('move', monsters);
   }
 
   function updateUserCount (count) {
