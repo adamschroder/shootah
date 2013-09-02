@@ -460,7 +460,18 @@ function renderEntities (ctx) {
 
   allEntities.sort(function (a, b) {
 
-    return a.y > b.y ? 1 : a.y < b.y ? -1 : 0;
+    if (a.x === b.x && a.y === b.y && a.type !== b.type) {
+      return a.type === 'monster' ? 1 : -1;
+    }
+    else {
+      if (a.y === b.y) {
+        return a.x > b.x ? 1 : a.x < b.x ? -1 : 0;
+      }
+      else {
+        return a.y > b.y ? 1 : -1;
+      }
+    }
+
   });
 
   for (var i=0, len = allEntities.length; i < len; i++) {
@@ -566,12 +577,10 @@ function render () {
   }
 
   var offset = 0;
-  img = rightImage;
-
   for (var player in scores) {
     scoreCtx.font = "30px Arial";
     scoreCtx.fillText('' + scores[player], 25, 0);
-    scoreCtx.drawImage(img, offset, 0, 50, 50);
+    scoreCtx.drawImage(rightImage, offset, 0, 50, 50);
     
     // offset += 50;
     // console.log('SCR', player, scores[player])
