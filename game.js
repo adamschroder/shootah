@@ -471,16 +471,17 @@ function renderEntities (ctx) {
         return a.y > b.y ? 1 : -1;
       }
     }
-
   });
 
+  var ent;
   for (var i=0, len = allEntities.length; i < len; i++) {
 
-    if (allEntities[i].type === 'player') {
-      renderPlayer(ctx, allEntities[i]);
+    ent = allEntities[i];
+    if (ent.type === 'player') {
+      renderPlayer(ctx, ent);
     }
-    else if (allEntities[i].type === 'monster') {
-      renderMonster(ctx, allEntities[i]);
+    else if (ent.type === 'monster') {
+      renderMonster(ctx, ent);
     }
   }
 }
