@@ -134,6 +134,7 @@ var bulletTimer = setInterval(function () {
   canShoot =  true;
 }, 150);
 
+// limit monster damage to ever half second
 var canTakeDamage = true;
 var damageTimer = setInterval(function () {
   canTakeDamage =  true;
@@ -429,19 +430,22 @@ function isOnBoard (obj) {
 }
 
 // load images (KEEP THIS OUT OF THE RENDER LOOP OMG!)
-var patternImg = new Image();
+var Img = Image;
+var patternImg = new Img();
 var pattern;
 patternImg.onload = function () {
-
   pattern = ctx.createPattern(patternImg, 'repeat');
 };
 patternImg.src = 'images/grass3.jpg';
 
-var monsterImage = new Image();
+var monsterImage = new Img();
 monsterImage.src = 'images/monster-right.png';
 
-var image = new Image();
+var rightImage = new Img();
+rightImage.src = 'images/blank-character-right.png';
 
+var leftImage = new Img();
+leftImage.src = "images/blank-character-left.png";
 
 // DO NOT CREATE OBJECTS IN HERE!
 function render () {
@@ -471,21 +475,19 @@ function render () {
   var thisBullet;
   for (var bullet in bullets) {
 
-    if (bullets.hasOwnProperty(bullet)) {
+    thisBullet = bullets[bullet];
+    if (thisBullet) {
+      updateBullet(thisBullet);
 
-      thisBullet = bullets[bullet];
-      if (thisBullet) {
-        updateBullet(thisBullet);
+      thisBullet && (ctx.fillStyle = '#d62822');
+      thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
 
-        thisBullet && (ctx.fillStyle = '#d62822');
-        thisBullet && (ctx.fillRect(thisBullet.x, thisBullet.y, 3, 3));
-
-        thisBullet && (ctx.fillStyle = '#f2b830');
-        thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
-      }
+      thisBullet && (ctx.fillStyle = '#f2b830');
+      thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
     }
   }
 
+  var img;
   for (var user in users) {
 
     colorSprite(ctx, users[user]);
@@ -493,7 +495,7 @@ function render () {
     // dis is the white line for facing
     ctx.strokeStyle = 'white';
     ctx.beginPath();
-    image.src = 'images/blank-character-right.png';
+    img = rightImage;
 
     switch (users[user].facing) {
       case 'up':
@@ -515,12 +517,12 @@ function render () {
       case 'left':
         ctx.moveTo(users[user].x - 5, users[user].y);
         ctx.lineTo(users[user].x - 5, users[user].y + 50);
-        image.src = "images/blank-character-left.png";
+        img = leftImage;
       break;
       case 'right':
         ctx.moveTo(users[user].x + 55, users[user].y);
         ctx.lineTo(users[user].x + 55, users[user].y + 50);
-        image.src = "images/blank-character-right.png";
+        img = rightImage;
       break;
       case 'up-right':
         ctx.moveTo(users[user].x + 75, users[user].y + 20);
@@ -532,7 +534,7 @@ function render () {
       break;
     }
 
-    ctx.drawImage(image, users[user].x, users[user].y, 50, 50);
+    ctx.drawImage(img, users[user].x, users[user].y, 50, 50);
 
     ctx.fill();
     ctx.stroke();
@@ -540,12 +542,12 @@ function render () {
   }
 
   var offset = 0;
-  image.src = 'images/blank-character-right.png';
+  img = rightImage;
 
   for (var player in scores) {
     scoreCtx.font = "30px Arial";
     scoreCtx.fillText('' + scores[player], 25, 0);
-    scoreCtx.drawImage(image, offset, 0, 50, 50);
+    scoreCtx.drawImage(img, offset, 0, 50, 50);
     
     // offset += 50;
     // console.log('SCR', player, scores[player])
