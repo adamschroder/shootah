@@ -1,4 +1,4 @@
-// var socket = io.connect('http://192.168.2.35:8080');
+// var socket = io.connect('http://192.168.2.95:8080');
 var socket = io.connect('http://localhost:8080');
 
 var canvas = document.getElementById('canvas');
@@ -23,7 +23,7 @@ var time = Date.now();
 
 try {
   userData = JSON.parse(window.localStorage.getItem('user'));
-  userData.isDead = false;
+  userData.isDead = 0;
   userData.health = 10;
 }
 catch (e) {}
@@ -107,8 +107,9 @@ socket.on('userDamaged', function (data) {
 socket.on('userDeath', function (id) {
 
   var user = users[id];
-  id !== userId && user && delete users[id];
-  // todo animation of user death?
+  if (user && id !== userId) {
+    user.isDead = 1;
+  }
 });
 
 socket.on('updateScore', function (_scores) {
@@ -154,7 +155,7 @@ function checkUserCollisions () {
   if (monster) {
 
     userData.health -= monster.damage;
-    (userData.health <= 0) && (userData.isDead = true) && console.log('you dead');
+    (userData.health <= 0) && (userData.isDead = 1) && console.log('you dead');
     socket.emit('hitUser', {'id': userData.id, 'damage': monster.damage});
   }
 }
@@ -477,7 +478,7 @@ function renderEntities (ctx) {
   for (var i=0, len = all.length; i < len; i++) {
 
     ent = all[i];
-    if (ent.type === 'player') {
+    if (ent.type === 'player' && !ent.isDead) {
       renderPlayer(ctx, ent);
     }
     else if (ent.type === 'monster') {
@@ -562,11 +563,12 @@ function render () {
 
   renderEntities(ctx);
 
-  var thisBullet;
+  var thisBullet, owner;
   for (var bullet in bullets) {
 
     thisBullet = bullets[bullet];
-    if (thisBullet) {
+    owner = thisBullet && users[thisBullet.owner];
+    if (thisBullet && !owner.isDead) {
       updateBullet(thisBullet);
 
       thisBullet && (ctx.fillStyle = '#d62822');

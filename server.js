@@ -30,7 +30,7 @@ io.sockets.on('connection', function (socket) {
 
     // send other players to this joining player
     for (var player in users) {
-      if (users[player].id !== user.id) {
+      if (users[player].id !== user.id && !users[player].isDead) {
         socket.emit('join', users[player]);
       }
     }
@@ -104,7 +104,7 @@ function hitUser (data) {
   if (user) {
     user.health -= data.damage;
     if (user.health <= 0) {
-      user.isDead = true;
+      user.isDead = 1;
       io.sockets.emit('userDeath', user.id);
       updateUserCount();
     }
@@ -128,7 +128,7 @@ function createUser (socket, data) {
 
     // remap old data
     userData = users[sessionId];
-    userData.isDead = false;
+    userData.isDead = 0;
     userData.health = data.health || 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
