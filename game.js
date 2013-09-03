@@ -14,7 +14,7 @@ scoreCanvas.height = 100;
 var mod, sessionId, userData, userId;
 var users = {};
 var bullets = {};
-var ids = [];
+var ids = {};
 var monsters = {};
 var keysDown = {};
 var scores = {};
@@ -450,15 +450,15 @@ leftImage.src = "images/blank-character-left.png";
 
 // DO NOT CREATE OBJECTS IN HERE!
 function renderEntities (ctx) {
-  var allEntities = [];
+  var all = [];
   for (var user in users) {
-    allEntities.push(users[user]);
+    all.push(users[user]);
   }
   for (var monster in monsters) {
-    allEntities.push(monsters[monster]);
+    all.push(monsters[monster]);
   }
 
-  allEntities.sort(function (a, b) {
+  all.sort(function (a, b) {
 
     if (a.x === b.x && a.y === b.y && a.type !== b.type) {
       return a.type === 'monster' ? 1 : -1;
@@ -474,9 +474,9 @@ function renderEntities (ctx) {
   });
 
   var ent;
-  for (var i=0, len = allEntities.length; i < len; i++) {
+  for (var i=0, len = all.length; i < len; i++) {
 
-    ent = allEntities[i];
+    ent = all[i];
     if (ent.type === 'player') {
       renderPlayer(ctx, ent);
     }
