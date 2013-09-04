@@ -23,6 +23,7 @@
   var monsters = {};
   var keysDown = {};
   var scores = {};
+  var timed = 0;
 
   var time = Date.now();
 
@@ -138,7 +139,13 @@
 
   respawn.addEventListener('click', function (e) {
 
+    var user = users[userData.id];
+    user.isDead = 0;
 
+    socket.emit('userRespawn', {'id': userData.id});
+    timed = 0;
+    respawn.style.display = 'none';
+    canvas.className = '';
   });
 
   // methods
@@ -155,7 +162,6 @@
     canTakeDamage =  true;
   }, 500);
 
-  var timed = 0;
   function respawnTimer () {
 
     if (!timed) {
@@ -190,7 +196,7 @@
       userData.health -= monster.damage;
       if ((userData.health <= 0) && (userData.isDead = 1)) {
 
-        canvas.className = 'dead';
+        canvas.className = 'd';
         respawn.style.display = 'block';
       }
 
@@ -512,7 +518,7 @@
   function renderPlayer(ctx, player) {
 
     var img;
-    
+
     if (player.hitCountdown && player.hitCountdown % 10 === 1) {
       player.show = !player.show;
     }
