@@ -60,7 +60,7 @@ io.sockets.on('connection', function (socket) {
 
     user.isDead = 0;
     user.health = 10;
-    socket.emit('join', user);
+    io.sockets.emit('join', user);
   });
 
   socket.on('newBullet', function (bullet) {
