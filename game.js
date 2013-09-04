@@ -169,6 +169,7 @@ function getNextVector (v, a, m) {
   return v;
 }
 
+var vp = {'x':0, 'y':0};
 function update () {
 
   if (userData.isDead) {
@@ -179,27 +180,28 @@ function update () {
   if (checkBounds()) {
     var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
     var movement = false;
+    var angle = false;
     if (65 in keysDown) { // left
-
-      userData.x -= offset;
-      movement = true;
+      angle = 83 in keysDown ? 135 : 87 in keysDown ? 225 : 180;
     }
-    if (87 in keysDown) { // down
-
-      userData.y -= offset;
-      movement = true;
+    else if (68 in keysDown) { // right
+      angle = 83 in keysDown ? 45 : 87 in keysDown ? 315 : 0;
     }
-    if (68 in keysDown) { // right
-
-      userData.x += offset;
-      movement = true;
+    else if (87 in keysDown) { // up
+      angle = 270;
     }
-    if (83 in keysDown) { // up
-
-     userData.y += offset;
-     movement = true;
+    else if (83 in keysDown) { // down
+      angle = 90;
     }
-    movement && socket.emit('updateMovement', userData);
+
+    if (angle !== false) {
+      vp.x = userData.x;
+      vp.y = userData.y;
+      vp = getNextVector(vp, angle, offset);
+      userData.x = vp.x;
+      userData.y = vp.y;
+      socket.emit('updateMovement', userData);
+    }
   }
 
   // aiming
