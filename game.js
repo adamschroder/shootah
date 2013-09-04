@@ -613,6 +613,11 @@
       // offset += 50;
       // console.log('SCR', player, scores[player])
     }
+
+    if (owner.isDead) {
+
+      canvas.className = 'dead';
+    }
   }
 
   function colorSprite (ctx, user) {
