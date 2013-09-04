@@ -495,7 +495,7 @@
     for (var i=0, len = all.length; i < len; i++) {
 
       ent = all[i];
-      if (ent.type === 'player' && !ent.isDead) {
+      if (ent.type === 'player' && !ent.isDead && ent.isConnected) {
         renderPlayer(ctx, ent);
       }
       else if (ent.type === 'monster') {
