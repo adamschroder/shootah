@@ -103,6 +103,7 @@
     var user = users[data.id];
     if (user) {
       user.health = data.health;
+      user.hitCountdown = 100;
     }
   });
 
@@ -506,6 +507,21 @@
   function renderPlayer(ctx, player) {
 
     var img;
+    
+    if (player.hitCountdown && player.hitCountdown % 10 === 1) {
+      player.show = !player.show;
+    }
+
+    player.hitCountdown--;
+
+    if (!player.hitCountdown) {
+      player.show = 1;
+    }
+
+    if (!player.show) {
+      return;
+    }
+
     colorSprite(ctx, player);
 
     // dis is the white line for facing
