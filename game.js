@@ -620,6 +620,13 @@
         thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
       }
     }
+
+    // render health
+    var health = users[userId].health;
+    ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+    var incr = canvas.height / 10;
+    var value = incr * health;
+    ctx.fillRect(canvas.width - 10, 0, canvas.width, value);
   }
 
   function colorSprite (ctx, user) {
