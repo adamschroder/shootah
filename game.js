@@ -1,7 +1,6 @@
-
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.95:8080');
+  var socket = io.connect('http://192.168.2.95:8888');
   //var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
@@ -162,7 +161,7 @@
       canvas.className = '';
     }
   }
-  respawn.addEventListener('click', respawn);
+  respawn.addEventListener('click', respawnSelf);
 
   // methods
 
@@ -566,6 +565,7 @@
       ctx.fillText("You", player.x + 12, player.y + 65);
     }
     else {
+      console.log(player.name)
       ctx.fillText(player.name, player.x + 12, player.y + 65);
     }
 
