@@ -12,7 +12,7 @@ module.exports = (function () {
   var rate = 1;
   var monsters = {};
   var monsterIds = {};
-  var maxMonsters = 100;
+  var maxMonsters = 50;
   var speed = 0.5;
   var userCount = 0;
 

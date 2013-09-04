@@ -22,8 +22,6 @@
 
   var time = Date.now();
 
-  console.log('game');
-
   try {
 
     var oldUser = window.localStorage.getItem('user');

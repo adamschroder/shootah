@@ -124,9 +124,9 @@ function hitUser (data) {
   var user = users[sessionIds[data.id]];
   if (user) {
     user.health -= data.damage;
-    if (user.health <= 0) {
-      user.isDead = 1;
+    if (user.health <= 0 && !user.isDead) {
       io.sockets.emit('userDeath', user.id);
+      user.isDead = 1;
       updateUserCount();
     }
     else {
