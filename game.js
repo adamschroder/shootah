@@ -1,8 +1,8 @@
 
 // make the game private, no cheaters!
 (function () {
-  // var socket = io.connect('http://192.168.2.95:8080');
-  var socket = io.connect('http://localhost:8080');
+  var socket = io.connect('http://192.168.2.95:8080');
+  // var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -11,7 +11,7 @@
 
   var respawn = document.getElementById('r');
 
-  var mod, sessionId, userData, userId;
+  var mod, sessionId, userData, userId, t;
   var users = {};
   var bullets = {};
   var ids = {};
@@ -134,13 +134,17 @@
 
   respawn.addEventListener('click', function (e) {
 
-    var user = users[userData.id];
-    user.isDead = 0;
+    if (!t) {
 
-    socket.emit('userRespawn', {'id': userData.id});
-    timed = 0;
-    respawn.style.display = 'none';
-    canvas.className = '';
+      var user = users[userData.id];
+      user.isDead = 0;
+
+      socket.emit('userRespawn', {'id': userData.id});
+      timed = 0;
+      t = 10;
+      respawn.style.display = 'none';
+      canvas.className = '';
+    }
   });
 
   // methods
@@ -162,13 +166,14 @@
     if (!timed) {
 
       timed = 1;
-      var t = 10;
+      t = 10;
       var dt = document.getElementById('timer');
       var timer = setInterval(function () {
 
         dt.innerHTML = t--;
 
         if (t === 0) {
+
           dt.innerHTML = 'Respawn';
           clearTimeout(timer);
         }
