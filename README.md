@@ -7,18 +7,7 @@ JS mulitplayer survival shootem-up
 
 TODO
 ======
- - order collection rendering by y position so that higher up entities render behind lower entities
- - remove facing lines
- - create build process that simply uglifies js and zips with assets
- - sprites
- - sounds/music
- - score board - inprogress 
- - game states/screens
-   - joining the game (entering name)
-   - user death
-   - game over ?
-   - leader board
- - server.js should serve index.html and assets on port 80 (simple node http)
+wunderlist: [JS13k] SHOOTAH
 
 
 concepts
