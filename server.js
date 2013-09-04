@@ -23,6 +23,9 @@ var floor = Math.floor;
 
 io.sockets.on('connection', function (socket) {
 
+  var user = users[socket.id];
+  user && (user.isConnected = 1);
+
   socket.on('userJoined', function (data) {
 
     var user = createUser(socket, data);
@@ -71,6 +74,12 @@ io.sockets.on('connection', function (socket) {
   socket.on('hitUser', function (data) {
 
     hitUser(data);
+  });
+
+  socket.on('disconnect', function (data) {
+
+    var user = users[socket.id];
+    user && (user.isConnected = 0);
   });
 });
 
@@ -129,6 +138,7 @@ function createUser (socket, data) {
     // remap old data
     userData = users[sessionId];
     userData.isDead = 0;
+    userData.isConnected = 1;
     userData.health = data.health || 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
@@ -150,7 +160,9 @@ function createUser (socket, data) {
       'health': 10,
       'eyeColor': eyeColors[floor(rnd()*eyeColors.length)],
       'pantsColor': '#'+floor(rnd()*16777215).toString(16),
-      'facing':'down'
+      'facing':'down',
+      'isDead': 0,
+      'isConnected': 1
     };
 
     sessionIds[userData.id] = socket.id;
