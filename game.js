@@ -262,9 +262,9 @@
       return false;
     }
 
-    if (userData.y >= 500) {
+    if (userData.y >= 550) {
 
-      userData.y = 490;
+      userData.y = userData.y - 5;
       return false;
     }
 
