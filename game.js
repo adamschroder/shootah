@@ -9,6 +9,8 @@
   canvas.width = 800;
   canvas.height = 600;
 
+  var respawn = document.getElementById('r');
+
   var scoreCanvas = document.getElementById('score');
   var scoreCtx = scoreCanvas.getContext('2d');
   scoreCanvas.width = 800;
@@ -112,7 +114,10 @@
     var user = users[id];
     if (user && id !== userId) {
       user.isDead = 1;
+      return;
     }
+
+    respawnTimer();
   });
 
   socket.on('updateScore', function (_scores) {
@@ -130,6 +135,11 @@
     delete keysDown[e.keyCode];
   });
 
+  respawn.addEventListener('click', function (e) {
+
+
+  });
+
   // methods
 
   // rate limiting
@@ -144,6 +154,25 @@
     canTakeDamage =  true;
   }, 500);
 
+  var timed = 0;
+  function respawnTimer () {
+
+    if (!timed) {
+
+      timed = 1;
+      var t = 10;
+      var dt = document.getElementById('timer');
+      var timer = setInterval(function () {
+
+        dt.innerHTML = t--;
+
+        if (t === 0) {
+          dt.innerHTML = 'Respawn';
+          clearTimeout(timer);
+        }
+      }, 1000);
+    }
+  }
 
   function checkUserCollisions () {
 
@@ -158,7 +187,12 @@
     if (monster) {
 
       userData.health -= monster.damage;
-      (userData.health <= 0) && (userData.isDead = 1) && console.log('you dead');
+      if ((userData.health <= 0) && (userData.isDead = 1)) {
+
+        canvas.className = 'dead';
+        respawn.style.display = 'block';
+      }
+
       socket.emit('hitUser', {'id': userData.id, 'damage': monster.damage});
     }
   }
@@ -513,7 +547,6 @@
     ctx.strokeStyle = 'white';
     ctx.beginPath();
 
-
     if (userData.id === player.id) {
 
       ctx.fillStyle = 'white';
@@ -612,11 +645,6 @@
 
       // offset += 50;
       // console.log('SCR', player, scores[player])
-    }
-
-    if (owner.isDead) {
-
-      canvas.className = 'dead';
     }
   }
 
