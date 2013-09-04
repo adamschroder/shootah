@@ -12,8 +12,8 @@ module.exports = (function () {
   var rate = 1;
   var monsters = {};
   var monsterIds = {};
-  var maxMonsters = 25;
-  var speed = 1;
+  var maxMonsters = 100;
+  var speed = 0.5;
   var userCount = 0;
 
   var board = {

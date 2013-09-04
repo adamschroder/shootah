@@ -593,7 +593,7 @@
 
       thisBullet = bullets[bullet];
       owner = thisBullet && users[thisBullet.owner];
-      if (thisBullet && !owner.isDead) {
+      if (thisBullet && owner && !owner.isDead) {
         updateBullet(thisBullet);
 
         thisBullet && (ctx.fillStyle = '#d62822');
