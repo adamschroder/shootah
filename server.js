@@ -54,6 +54,15 @@ io.sockets.on('connection', function (socket) {
     monsterdirector.updateTarget(data);
   });
 
+  socket.on('userRespawn', function (data) {
+
+    var user = users[sessionIds[data.id]];
+
+    user.isDead = 0;
+    user.health = 10;
+    socket.emit('join', user);
+  });
+
   socket.on('newBullet', function (bullet) {
 
     io.sockets.emit('newBullet', bullet);

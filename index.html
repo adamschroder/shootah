@@ -1,22 +1,49 @@
 <!doctype>
 <html>
+<!-- .d is dead, #r is respawn , #c is character-->
   <head>
     <title>Shootah</title>
     <style>
       body {
         text-align:center;
       }
+
+      .d {
+        -webkit-filter: grayscale(100%);
+      }
+
+      #r {
+        display: none;
+        position: relative;
+        top:-450px;
+        color:#fff;
+        font-family: helvetica;
+        font-size: 28px;
+        text-align:center;
+      }
+
+      #r a {
+        color:red;
+        text-decoration: none;
+      }
+
+      #c {
+        margin: 0 auto;
+      }
     </style>
   </head>
   <body>
     <canvas id="score"></canvas>
     <canvas id="canvas" style="width: 800px; height:600px;margin:0 auto; "></canvas>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-    <script type="text/javascript" src="game.js"></script>
     <pre>
       move: wasd
       aim: arrows
       shoot: space
     </pre>
+    <div id="r">YOU HAVE FAILED <br/><span id="timer"</span></div>
+    <div id="c">Choose a name! <input type="text"/><a href="#">Sumbit</a></div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" src="game.js"></script>
   </body>
 </html>

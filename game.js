@@ -9,10 +9,7 @@
   canvas.width = 800;
   canvas.height = 600;
 
-  var scoreCanvas = document.getElementById('score');
-  var scoreCtx = scoreCanvas.getContext('2d');
-  scoreCanvas.width = 800;
-  scoreCanvas.height = 100;
+  var respawn = document.getElementById('r');
 
   var mod, sessionId, userData, userId;
   var users = {};
@@ -21,6 +18,7 @@
   var monsters = {};
   var keysDown = {};
   var scores = {};
+  var timed = 0;
 
   var time = Date.now();
 
@@ -104,6 +102,7 @@
     var user = users[data.id];
     if (user) {
       user.health = data.health;
+      user.hitCountdown = 100;
     }
   });
 
@@ -112,7 +111,10 @@
     var user = users[id];
     if (user && id !== userId) {
       user.isDead = 1;
+      return;
     }
+
+    respawnTimer();
   });
 
   socket.on('updateScore', function (_scores) {
@@ -130,6 +132,17 @@
     delete keysDown[e.keyCode];
   });
 
+  respawn.addEventListener('click', function (e) {
+
+    var user = users[userData.id];
+    user.isDead = 0;
+
+    socket.emit('userRespawn', {'id': userData.id});
+    timed = 0;
+    respawn.style.display = 'none';
+    canvas.className = '';
+  });
+
   // methods
 
   // rate limiting
@@ -144,6 +157,24 @@
     canTakeDamage =  true;
   }, 500);
 
+  function respawnTimer () {
+
+    if (!timed) {
+
+      timed = 1;
+      var t = 10;
+      var dt = document.getElementById('timer');
+      var timer = setInterval(function () {
+
+        dt.innerHTML = t--;
+
+        if (t === 0) {
+          dt.innerHTML = 'Respawn';
+          clearTimeout(timer);
+        }
+      }, 1000);
+    }
+  }
 
   function checkUserCollisions () {
 
@@ -158,7 +189,12 @@
     if (monster) {
 
       userData.health -= monster.damage;
-      (userData.health <= 0) && (userData.isDead = 1) && console.log('you dead');
+      if ((userData.health <= 0) && (userData.isDead = 1)) {
+
+        canvas.className = 'd';
+        respawn.style.display = 'block';
+      }
+
       socket.emit('hitUser', {'id': userData.id, 'damage': monster.damage});
     }
   }
@@ -226,7 +262,7 @@
     // space
     if (32 in keysDown) {
       if (canShoot) {
-        var bullet = new Bullet(userData.x, userData.y + (userData.width / 2), userData.facing, userData.id);
+        var bullet = new Bullet(userData.x + (userData.height / 2), userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
       }
@@ -261,9 +297,9 @@
       return false;
     }
 
-    if (userData.y >= 500) {
+    if (userData.y >= 550) {
 
-      userData.y = 490;
+      userData.y = userData.y - 5;
       return false;
     }
 
@@ -477,12 +513,26 @@
   function renderPlayer(ctx, player) {
 
     var img;
+
+    if (player.hitCountdown && player.hitCountdown % 10 === 1) {
+      player.show = !player.show;
+    }
+
+    player.hitCountdown--;
+
+    if (!player.hitCountdown) {
+      player.show = 1;
+    }
+
+    if (!player.show) {
+      return;
+    }
+
     colorSprite(ctx, player);
 
     // dis is the white line for facing
     ctx.strokeStyle = 'white';
     ctx.beginPath();
-
 
     if (userData.id === player.id) {
 
@@ -542,9 +592,6 @@
 
   function render () {
 
-    scoreCtx.fillStyle = '#f00';
-    scoreCtx.fillRect(0, 0, scoreCanvas.width, scoreCanvas.height);
-
     // ctx.fillStyle = '#000';
 
     // BG
@@ -572,16 +619,6 @@
         thisBullet && (ctx.fillStyle = '#f2b830');
         thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
       }
-    }
-
-    var offset = 0;
-    for (var player in scores) {
-      scoreCtx.font = "30px Arial";
-      scoreCtx.fillText('' + scores[player], 25, 0);
-      scoreCtx.drawImage(rightImage, offset, 0, 50, 50);
-
-      // offset += 50;
-      // console.log('SCR', player, scores[player])
     }
   }
 
