@@ -125,6 +125,7 @@ module.exports = (function () {
 
   function spawnMonsters () {
 
+    return;
     var amount = userCount * rate;
     var monster;
 
