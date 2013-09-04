@@ -1,3 +1,4 @@
+
 // make the game private, no cheaters!
 (function () {
   // var socket = io.connect('http://192.168.2.95:8080');
@@ -208,54 +209,24 @@
     }
 
     // aiming
-    var aiming = false;
-    if (38 in keysDown && 37 in keysDown) {
-
-      userData.facing = 'up-left';
-      aiming = true;
-    }
-    else if (40 in keysDown && 37 in keysDown) {
-
-      userData.facing = 'down-left';
-      aiming = true;
-    }
-    else if (38 in keysDown && 39 in keysDown) {
-
-      userData.facing = 'up-right';
-      aiming = true;
-    }
-    else if (40 in keysDown && 39 in keysDown) {
-
-      userData.facing = 'down-right';
-      aiming = true;
-    }
-    else if (38 in keysDown) {
-
-      userData.facing = 'up';
-      aiming = true;
-    }
-    else if (37 in keysDown) {
-
-      userData.facing = 'left';
-      aiming = true;
-    }
-    else if (39 in keysDown) {
-
-      userData.facing = 'right';
-      aiming = true;
+    var facing;
+    if (38 in keysDown) {
+      facing =  37 in keysDown ? 'up-left' : 39 in keysDown ? 'up-right' : 'up';
     }
     else if (40 in keysDown) {
-
-      userData.facing = 'down';
-      aiming = true;
+      facing = 37 in keysDown ? 'down-left' : 39 in keysDown ? 'down-right' : 'down';
     }
-    aiming && socket.emit('updateMovement', userData);
+    else if (37 in keysDown) {
+      facing = 'left';
+    }
+    else if (39 in keysDown) {
+      facing = 'right';
+    }
+    facing && (userData.facing = facing) && socket.emit('updateMovement', userData);
 
     // space
     if (32 in keysDown) {
-
       if (canShoot) {
-
         var bullet = new Bullet(userData.x, userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
@@ -495,7 +466,7 @@
     for (var i=0, len = all.length; i < len; i++) {
 
       ent = all[i];
-      if (ent.type === 'player' && !ent.isDead) {
+      if (ent.type === 'player' && !ent.isDead && ent.isConnected) {
         renderPlayer(ctx, ent);
       }
       else if (ent.type === 'monster') {
@@ -527,6 +498,14 @@
     // dis is the white line for facing
     ctx.strokeStyle = 'white';
     ctx.beginPath();
+
+
+    if (userData.id === player.id) {
+
+      ctx.fillStyle = 'white';
+      ctx.fillText("You", player.x + 12, player.y + 65);
+    }
+
     img = rightImage;
 
     switch (player.facing) {
@@ -590,7 +569,7 @@
       ctx.fillStyle = pattern;
       ctx.fill();
     }
-    
+
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     renderEntities(ctx);
@@ -616,7 +595,7 @@
       scoreCtx.font = "30px Arial";
       scoreCtx.fillText('' + scores[player], 25, 0);
       scoreCtx.drawImage(rightImage, offset, 0, 50, 50);
-      
+
       // offset += 50;
       // console.log('SCR', player, scores[player])
     }
