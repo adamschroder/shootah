@@ -9,7 +9,6 @@ TODO
 ======
 wunderlist: [JS13k] SHOOTAH
 
-
 concepts
 ========
 
@@ -32,3 +31,9 @@ where should collision detection occur?
 
 the more logic put onto the backend, the more code we can use on the client for animations, efx, SOUNDS!!!, etc.
 
+How to get started
+================
+
+``npm install ``
+
+``node server`
