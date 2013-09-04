@@ -208,54 +208,24 @@
     }
 
     // aiming
-    var aiming = false;
-    if (38 in keysDown && 37 in keysDown) {
-
-      userData.facing = 'up-left';
-      aiming = true;
-    }
-    else if (40 in keysDown && 37 in keysDown) {
-
-      userData.facing = 'down-left';
-      aiming = true;
-    }
-    else if (38 in keysDown && 39 in keysDown) {
-
-      userData.facing = 'up-right';
-      aiming = true;
-    }
-    else if (40 in keysDown && 39 in keysDown) {
-
-      userData.facing = 'down-right';
-      aiming = true;
-    }
-    else if (38 in keysDown) {
-
-      userData.facing = 'up';
-      aiming = true;
-    }
-    else if (37 in keysDown) {
-
-      userData.facing = 'left';
-      aiming = true;
-    }
-    else if (39 in keysDown) {
-
-      userData.facing = 'right';
-      aiming = true;
+    var facing;
+    if (38 in keysDown) {
+      facing =  37 in keysDown ? 'up-left' : 39 in keysDown ? 'up-right' : 'up';
     }
     else if (40 in keysDown) {
-
-      userData.facing = 'down';
-      aiming = true;
+      facing = 37 in keysDown ? 'down-left' : 39 in keysDown ? 'down-right' : 'down';
     }
-    aiming && socket.emit('updateMovement', userData);
+    else if (37 in keysDown) {
+      facing = 'left';
+    }
+    else if (39 in keysDown) {
+      facing = 'right';
+    }
+    facing && (userData.facing = facing) && socket.emit('updateMovement', userData);
 
     // space
     if (32 in keysDown) {
-
       if (canShoot) {
-
         var bullet = new Bullet(userData.x, userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
