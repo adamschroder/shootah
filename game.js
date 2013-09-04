@@ -227,7 +227,7 @@
     // space
     if (32 in keysDown) {
       if (canShoot) {
-        var bullet = new Bullet(userData.x, userData.y + (userData.width / 2), userData.facing, userData.id);
+        var bullet = new Bullet(userData.x + (userData.height / 2), userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
       }
