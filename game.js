@@ -512,6 +512,14 @@
     // dis is the white line for facing
     ctx.strokeStyle = 'white';
     ctx.beginPath();
+
+
+    if (userData.id === player.id) {
+
+      ctx.fillStyle = 'white';
+      ctx.fillText("You", player.x + 12, player.y + 65);
+    }
+
     img = rightImage;
 
     switch (player.facing) {
