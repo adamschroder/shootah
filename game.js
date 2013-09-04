@@ -9,11 +9,6 @@
   canvas.width = 800;
   canvas.height = 600;
 
-  var scoreCanvas = document.getElementById('score');
-  var scoreCtx = scoreCanvas.getContext('2d');
-  scoreCanvas.width = 800;
-  scoreCanvas.height = 100;
-
   var mod, sessionId, userData, userId;
   var users = {};
   var bullets = {};
@@ -558,9 +553,6 @@
 
   function render () {
 
-    scoreCtx.fillStyle = '#f00';
-    scoreCtx.fillRect(0, 0, scoreCanvas.width, scoreCanvas.height);
-
     // ctx.fillStyle = '#000';
 
     // BG
@@ -588,16 +580,6 @@
         thisBullet && (ctx.fillStyle = '#f2b830');
         thisBullet && (ctx.fillRect(thisBullet.x + 4, thisBullet.y, 3, 3));
       }
-    }
-
-    var offset = 0;
-    for (var player in scores) {
-      scoreCtx.font = "30px Arial";
-      scoreCtx.fillText('' + scores[player], 25, 0);
-      scoreCtx.drawImage(rightImage, offset, 0, 50, 50);
-
-      // offset += 50;
-      // console.log('SCR', player, scores[player])
     }
   }
 
