@@ -1,8 +1,8 @@
 
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.95:8080');
-  // var socket = io.connect('http://localhost:8080');
+  // var socket = io.connect('http://192.168.2.95:8080');
+  var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -629,9 +629,9 @@
     // render health
     var health = users[userId].health;
     ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-    var incr = canvas.height / 10;
+    var incr = (canvas.width - 10) / 10;
     var value = incr * health;
-    ctx.fillRect(canvas.width - 10, 0, canvas.width, value);
+    ctx.fillRect(5, 5, value, 15);
   }
 
   function colorSprite (ctx, user) {
