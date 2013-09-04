@@ -160,6 +160,15 @@ function checkUserCollisions () {
   }
 }
 
+var rm = Math.PI/180;
+function getNextVector (v, a, m) {
+
+  v.y = v.y + (Math.sin(rm*a) * m);
+  v.x = v.x + (Math.cos(rm*a) * m);
+
+  return v;
+}
+
 function update () {
 
   if (userData.isDead) {
@@ -298,39 +307,42 @@ function Bullet (x, y, direction, owner) {
   b.direction = direction;
   b.speed = 500;
 }
-
+var bv = {'x': 0, 'y': 0};
 function updateBullet (b) {
 
   var dir = b.direction;
-  var spd = b.speed;
+  var spd = b.speed * mod;
+  var angle = 0;
+  bv.x = b.x;
+  bv.y = b.y;
   if (dir === 'up') {
-    b.y -= spd * mod;
+    angle = 270;
   }
   else if (dir === 'up-left') {
-    b.y -= spd * mod;
-    b.x -= spd * mod;
+    angle = 225;
   }
   else if (dir === 'up-right') {
-    b.y -= spd * mod;
-    b.x += spd * mod;
+    angle = 315;
   }
   else if (dir === 'down') {
-    b.y += spd * mod;
+    angle = 90;
   }
   else if (dir === 'down-left') {
-    b.y += spd * mod;
-    b.x -= spd * mod;
+    angle = 135;
   }
   else if (dir === 'down-right') {
-    b.y += spd * mod;
-    b.x += spd * mod;
+    angle = 45;
   }
   else if (dir === 'left') {
-    b.x -= spd * mod;
+    angle = 180;
   }
   else if (dir === 'right') {
-    b.x += spd * mod;
+    angle = 0;
   }
+
+  bv = getNextVector(bv, angle, spd);
+  b.x = bv.x;
+  b.y = bv.y;
 
   // only manage bullet collision for self
   if (b.owner === userId) {
