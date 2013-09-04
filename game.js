@@ -26,12 +26,30 @@
     userData = JSON.parse(window.localStorage.getItem('user'));
     userData.isDead = 0;
     userData.health = 10;
+
+    if (!userData.name) {
+      canvas.style.display = 'none';
+      document.getElementById('c').style.display = 'block';
+      document.getElementById('submit').addEventListener('click', function () {
+
+        var val = document.getElementsByTagName('input')[0].value;
+        if (val) {
+
+          userData.name = val;
+          canvas.style.display = 'block';
+          document.getElementById('c').style.display = 'none';
+          socket.emit('userJoined', userData);
+        }
+      });
+    }
+    else {
+
+      socket.emit('userJoined', userData);
+    }
   }
   catch (e) {}
 
   // server events
-
-  socket.emit('userJoined', userData);
 
   socket.on('join', function (data) {
 
@@ -123,12 +141,10 @@
 
   // key events
   window.addEventListener('keydown', function (e) {
-    e.preventDefault();
     keysDown[e.keyCode] = true;
   });
 
   window.addEventListener('keyup', function (e) {
-    e.preventDefault();
     delete keysDown[e.keyCode];
   });
 
@@ -538,11 +554,15 @@
     // dis is the white line for facing
     ctx.strokeStyle = 'white';
     ctx.beginPath();
+    ctx.fillStyle = 'white';
+
 
     if (userData.id === player.id) {
 
-      ctx.fillStyle = 'white';
       ctx.fillText("You", player.x + 12, player.y + 65);
+    }
+    else {
+      ctx.fillText(player.name, player.x + 12, player.y + 65);
     }
 
     img = rightImage;

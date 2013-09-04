@@ -151,6 +151,7 @@ function createUser (socket, data) {
     userData.health = data.health || 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
+    userData.name = data.name;
   }
   else {
     var eyeColors = ['#422d0f', '#2c92f0', '#43bb45'];
@@ -159,6 +160,7 @@ function createUser (socket, data) {
     userData = {
       'id': id,
       'type': 'player',
+      'name': '',
       'socketId': socket.id,
       'x': rnd()*200,
       'y': rnd()*200,
