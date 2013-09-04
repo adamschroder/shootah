@@ -58,9 +58,12 @@ io.sockets.on('connection', function (socket) {
 
     var user = users[sessionIds[data.id]];
 
-    user.isDead = 0;
-    user.health = 10;
-    io.sockets.emit('join', user);
+    if (user) {
+
+      user.isDead = 0;
+      user.health = 10;
+      io.sockets.emit('join', user);
+    }
   });
 
   socket.on('newBullet', function (bullet) {
@@ -121,9 +124,9 @@ function hitUser (data) {
   var user = users[sessionIds[data.id]];
   if (user) {
     user.health -= data.damage;
-    if (user.health <= 0) {
-      user.isDead = 1;
+    if (user.health <= 0 && !user.isDead) {
       io.sockets.emit('userDeath', user.id);
+      user.isDead = 1;
       updateUserCount();
     }
     else {
@@ -160,7 +163,7 @@ function createUser (socket, data) {
     userData = {
       'id': id,
       'type': 'player',
-      'name': '',
+      'name': data.name,
       'socketId': socket.id,
       'x': rnd()*200,
       'y': rnd()*200,

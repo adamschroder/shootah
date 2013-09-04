@@ -22,7 +22,9 @@
   var time = Date.now();
 
   try {
-    userData = JSON.parse(window.localStorage.getItem('user'));
+
+    var oldUser = window.localStorage.getItem('user');
+    userData = oldUser ? JSON.parse(oldUser) : new Object();
     userData.isDead = 0;
     userData.health = 10;
 
@@ -33,7 +35,6 @@
 
         var val = document.getElementsByTagName('input')[0].value;
         if (val) {
-
           userData.name = val;
           canvas.style.display = 'block';
           document.getElementById('c').style.display = 'none';
@@ -46,7 +47,10 @@
       socket.emit('userJoined', userData);
     }
   }
-  catch (e) {}
+  catch (e) {
+
+    throw new Error(e);
+  }
 
   // server events
 
@@ -75,7 +79,7 @@
 
       isMonster = data.type === 'monster';
       mover = isMonster ? monsters[id] : users[id];
-      if (mover && id !== userData.id) {
+      if (mover && userData && id !== userData.id) {
         mover.x = data.x;
         mover.y = data.y;
       }
