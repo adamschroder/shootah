@@ -1,8 +1,8 @@
 
 // make the game private, no cheaters!
 (function () {
-  // var socket = io.connect('http://192.168.2.95:8080');
-  var socket = io.connect('http://localhost:8080');
+  var socket = io.connect('http://192.168.2.95:8080');
+  // var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -132,7 +132,7 @@
     delete keysDown[e.keyCode];
   });
 
-  respawn.addEventListener('click', function (e) {
+  function respawnSelf (e) {
 
     if (!t) {
 
@@ -145,7 +145,8 @@
       respawn.style.display = 'none';
       canvas.className = '';
     }
-  });
+  }
+  respawn.addEventListener('click', respawn);
 
   // methods
 
@@ -217,6 +218,8 @@
   function update () {
 
     if (userData.isDead) {
+
+      if (!t && 32 in keysDown) respawnSelf();
       return;
     }
 
@@ -266,6 +269,7 @@
 
     // space
     if (32 in keysDown) {
+      
       if (canShoot) {
         var bullet = new Bullet(userData.x + (userData.height / 2), userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
