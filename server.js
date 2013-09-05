@@ -92,6 +92,7 @@ io.sockets.on('connection', function (socket) {
 
     var user = users[socket.id];
     user && (user.isConnected = 0);
+    // emit to sockets disconnection of user id
   });
 });
 
@@ -122,9 +123,9 @@ function updateUserCount () {
 function hitUser (data) {
 
   var user = users[sessionIds[data.id]];
-  if (user) {
+  if (user && !user.isDead) {
     user.health -= data.damage;
-    if (user.health <= 0 && !user.isDead) {
+    if (user.health <= 0) {
       io.sockets.emit('userDeath', user.id);
       user.isDead = 1;
       updateUserCount();
@@ -151,7 +152,7 @@ function createUser (socket, data) {
     userData = users[sessionId];
     userData.isDead = 0;
     userData.isConnected = 1;
-    userData.health = data.health || 10;
+    userData.health = 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
     userData.name = data.name;

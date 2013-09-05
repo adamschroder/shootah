@@ -25,7 +25,7 @@
   try {
 
     var oldUser = window.localStorage.getItem('user');
-    userData = oldUser ? JSON.parse(oldUser) : new Object();
+    userData = oldUser ? JSON.parse(oldUser) : {};
     userData.isDead = 0;
     userData.health = 10;
 
@@ -59,6 +59,8 @@
 
     sessionId = socket.socket.sessionid;
     if (data.socketId === sessionId) {
+
+      console.log(data);
 
       window.localStorage.setItem('user', JSON.stringify(data));
       userData = data;
@@ -131,12 +133,12 @@
   socket.on('userDeath', function (id) {
 
     var user = users[id];
-    if (user && id !== userId) {
+    if (user) {
       user.isDead = 1;
-      return;
+      if (id === userId) {
+        respawnTimer();
+      }
     }
-
-    respawnTimer();
   });
 
   socket.on('updateScore', function (_scores) {
@@ -189,9 +191,10 @@
       timed = 1;
       t = 10;
       var dt = document.getElementById('timer');
+      dt.innerHTML = t;
       var timer = setInterval(function () {
 
-        dt.innerHTML = t--;
+        dt.innerHTML = --t;
 
         if (t === 0) {
 
