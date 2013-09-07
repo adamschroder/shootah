@@ -697,7 +697,7 @@
 
   var audioContext = new webkitAudioContext();
 
-  // noise buffer
+  // noise buffer for bullets
   var bufferSize = 2 * audioContext.sampleRate,
       noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
       output = noiseBuffer.getChannelData(0);
@@ -718,6 +718,6 @@
     whiteNoise.buffer = noiseBuffer;
     whiteNoise.loop = true;
     whiteNoise.start(0);
-    setTimeout(function () { whiteNoise.stop(0);}, 40);
+    whiteNoise.stop(audioContext.currentTime + 0.04);
   }
 })();
