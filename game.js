@@ -108,6 +108,7 @@
 
     if (!bullets[data.id]) {
       bullets[data.id] = data;
+      bang();
     }
   });
 
@@ -297,6 +298,7 @@
         var bullet = new Bullet(userData.x + (userData.height / 2), userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
+        bang();
       }
 
       canShoot = false;
@@ -688,5 +690,34 @@
 
     // loop on next available frame
     window.requestAnimationFrame(run);
+  }
+
+  // AUDIO
+  // DO IT PROGRAMATICALLY LIKE A BOSS
+
+  var audioContext = new webkitAudioContext();
+
+  // noise buffer
+  var bufferSize = 2 * audioContext.sampleRate,
+      noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
+      output = noiseBuffer.getChannelData(0);
+  for (var i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+  }
+
+  // filter for bullets!
+  var filter = audioContext.createBiquadFilter();
+  filter.type = 0; // Low-pass filter. See BiquadFilterNode docs
+  filter.frequency.value = 1000;
+  filter.connect(audioContext.destination);
+
+  function bang () {
+
+    var whiteNoise = audioContext.createBufferSource();
+    whiteNoise.connect(filter);
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+    whiteNoise.start(0);
+    setTimeout(function () { whiteNoise.stop(0);}, 40);
   }
 })();
