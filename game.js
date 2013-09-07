@@ -694,27 +694,31 @@
 
   // AUDIO
   // DO IT PROGRAMATICALLY LIKE A BOSS
-
   var audioContext = new webkitAudioContext();
 
-  // noise buffer for bullets
-  var bufferSize = 2 * audioContext.sampleRate,
-      noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
-      output = noiseBuffer.getChannelData(0);
-  for (var i = 0; i < bufferSize; i++) {
+  // white noise buffer for bullets, other sounds
+  function createNoiseBuffer () {
+    var bufferSize = 2 * audioContext.sampleRate,
+        noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
+        output = noiseBuffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
       output[i] = Math.random() * 2 - 1;
-  }
+    }
 
+    return noiseBuffer;
+  }
+  var noiseBuffer = createNoiseBuffer();
+
+  // BULLETS
   // filter for bullets!
-  var filter = audioContext.createBiquadFilter();
-  filter.type = 0; // Low-pass filter. See BiquadFilterNode docs
-  filter.frequency.value = 1000;
-  filter.connect(audioContext.destination);
+  var bulletFilter = audioContext.createBiquadFilter();
+  bulletFilter.type = 0; // Low-pass filter. See BiquadFilterNode docs
+  bulletFilter.frequency.value = 900;
+  bulletFilter.connect(audioContext.destination);
 
   function bang () {
-
     var whiteNoise = audioContext.createBufferSource();
-    whiteNoise.connect(filter);
+    whiteNoise.connect(bulletFilter);
     whiteNoise.buffer = noiseBuffer;
     whiteNoise.loop = true;
     whiteNoise.start(0);
