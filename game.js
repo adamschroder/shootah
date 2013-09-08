@@ -138,6 +138,7 @@
       user.isDead = 1;
       if (id === userId) {
         respawnTimer();
+        killOwnBullets();
       }
     }
   });
@@ -352,6 +353,15 @@
     b.direction = direction;
     b.speed = 500;
   }
+
+  function killOwnBullets () {
+    var b;
+    for (var bullet in bullets) {
+      b = bullets[bullet];
+      (b.owner === userData.id) && delete bullets[bullet];
+    }
+  }
+
   var bv = {'x': 0, 'y': 0};
   function updateBullet (b) {
 
@@ -720,12 +730,14 @@
     var whiteNoise = audioContext.createBufferSource();
     var panner = audioContext.createPanner();
     xPan(xPos, panner);
-    bulletFilter.frequency.value = 900 + Math.floor(Math.random() * 201) - 100;
     whiteNoise.connect(panner);
+    // try to give bullets their own timbre
+    bulletFilter.frequency.value = 900 + Math.floor(Math.random() * 201) - 100;
     panner.connect(bulletFilter);
     // whiteNoise.connect(bulletFilter);
     whiteNoise.buffer = noiseBuffer;
     whiteNoise.loop = true;
+    // try to give bullets their own timbre
     whiteNoise.loopStart = Math.random() * (noiseBuffer.duration / 2);
     whiteNoise.start(0);
     whiteNoise.stop(audioContext.currentTime + 0.04);
