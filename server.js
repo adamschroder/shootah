@@ -117,8 +117,29 @@ monsterdirector.on('updateScore', function (user, score) {
   scoreBoard[user] += score;
 
   console.log('SCORE', scoreBoard);
-  io.sockets.emit('updateScore', scoreBoard);
+
+  sendDisplayableScoreBoard();
 });
+
+function sendDisplayableScoreBoard () {
+
+  var displayableScoreBoard = {};
+
+  var user;
+  for (var id in scoreBoard) {
+
+    user = getUser(id);
+    if (user) {
+      displayableScoreBoard[id] = {
+        'score': scoreBoard[id],
+        'name': user.name,
+        'color': user.color
+      };
+    }
+  }
+
+  io.sockets.emit('updateScore', displayableScoreBoard);
+}
 
 function getUser (userId) {
 

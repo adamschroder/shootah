@@ -4,6 +4,8 @@
   //var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
+  var scoreBoard = document.getElementById('st'); // score table, get it?
+
   var ctx = canvas.getContext('2d');
   canvas.width = 800;
   canvas.height = 600;
@@ -150,6 +152,7 @@
 
   socket.on('updateScore', function (_scores) {
     scores = _scores;
+    renderScores();
   });
 
   // key events
@@ -690,6 +693,35 @@
     ctx.fillRect(user.x + offset + 1, user.y + 10, 18, 10); // eyes
     ctx.fillStyle = user.pantsColor;
     ctx.fillRect(user.x + offset + 2,  user.y + 35, 16, 5); // pants
+  }
+
+  function renderScores () {
+
+    var frag = document.createDocumentFragment();
+
+    var tr;
+    var td;
+    var score;
+    for (var id in scores) {
+
+      score = scores[id];
+      tr = document.createElement('tr');
+
+      td = document.createElement('td');
+      td.innerText = score.name;
+
+      tr.appendChild(td);
+
+      td = document.createElement('td');
+      td.innerText = score.score;
+
+      tr.appendChild(td);
+
+      frag.appendChild(tr);
+    }
+
+    scoreBoard.innerHTML = '';
+    scoreBoard.appendChild(frag);
   }
 
   function run () {
