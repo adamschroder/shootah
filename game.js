@@ -3,14 +3,26 @@
   var socket = io.connect('http://192.168.2.39:8080');
   //var socket = io.connect('http://localhost:8080');
 
-  var canvas = document.getElementById('canvas');
-  var scoreBoard = document.getElementById('st'); // score table, get it?
+  var doc = document;
+  function getElById (id) {
+    return doc.getElementById(id);
+  }
+  function createEl (el) {
+    return doc.createElement(el);
+  }
+
+  var m = Math;
+  var rand = m.random;
+  var floor = m.floor;
+
+  var canvas = getElById('canvas');
+  var scoreBoard = getElById('st'); // score table, get it?
 
   var ctx = canvas.getContext('2d');
   canvas.width = 800;
   canvas.height = 600;
 
-  var respawn = document.getElementById('r');
+  var respawn = getElById('r');
 
   var mod, sessionId, userData, userId, respawnTime;
   var users = {};
@@ -31,14 +43,14 @@
 
     if (!userData.name) {
       canvas.style.display = 'none';
-      document.getElementById('c').style.display = 'block';
-      document.getElementById('submit').addEventListener('click', function () {
+      getElById('c').style.display = 'block';
+      getElById('submit').addEventListener('click', function () {
 
-        var val = document.getElementsByTagName('input')[0].value;
+        var val = doc.getElementsByTagName('input')[0].value;
         if (val) {
           userData.name = val;
           canvas.style.display = 'block';
-          document.getElementById('c').style.display = 'none';
+          getElById('c').style.display = 'none';
           socket.emit('userJoined', userData);
         }
       });
@@ -212,7 +224,7 @@
 
       timed = 1;
       respawnTime = 10;
-      var dt = document.getElementById('timer');
+      var dt = getElById('timer');
       dt.innerHTML = respawnTime;
       var timer = setInterval(function () {
 
@@ -371,9 +383,9 @@
 
   function getUID () {
 
-    var id = Math.random();
+    var id = rand();
     while (ids[id]) {
-      id = Math.random();
+      id = rand();
     }
     ids[id] = 1;
     return id;
@@ -720,7 +732,7 @@
 
   function renderScores () {
 
-    var frag = document.createDocumentFragment();
+    var frag = doc.createDocumentFragment();
 
     var tr;
     var td;
@@ -734,15 +746,15 @@
     for (var id in scores) {
 
       score = scores[id];
-      tr = document.createElement('tr');
+      tr = createEl('tr');
       tr.style.outline = 'thin solid ' + score.color;
 
-      td = document.createElement('td');
+      td = createEl('td');
       td.innerText = score.name;
 
       tr.appendChild(td);
 
-      td = document.createElement('td');
+      td = createEl('td');
       td.innerText = score.score;
 
       tr.appendChild(td);
@@ -777,7 +789,7 @@
         noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
         output = noiseBuffer.getChannelData(0);
     for (var i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
+      output[i] = rand() * 2 - 1;
     }
 
     return noiseBuffer;
@@ -797,13 +809,13 @@
     xPan(xPos, panner);
     whiteNoise.connect(panner);
     // try to give bullets their own timbre
-    bulletFilter.frequency.value = 900 + Math.floor(Math.random() * 201) - 100;
+    bulletFilter.frequency.value = 900 + floor(rand() * 201) - 100;
     panner.connect(bulletFilter);
     // whiteNoise.connect(bulletFilter);
     whiteNoise.buffer = noiseBuffer;
     whiteNoise.loop = true;
     // try to give bullets their own timbre
-    whiteNoise.loopStart = Math.random() * (noiseBuffer.duration / 2);
+    whiteNoise.loopStart = rand() * (noiseBuffer.duration / 2);
     whiteNoise.start(0);
     whiteNoise.stop(audioContext.currentTime + 0.04);
   }
@@ -813,7 +825,7 @@
   function xPan (entityX, pannerNode) {
 
     var width = canvas.width;
-    var middle = Math.floor(canvas.width / 2);
+    var middle = floor(canvas.width / 2);
     var max = 22;
     var angle;
 
