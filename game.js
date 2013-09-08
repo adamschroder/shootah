@@ -166,7 +166,7 @@
 
   function respawnSelf (e) {
 
-    if (!respawnTimer) {
+    if (!respawnTime) {
 
       var user = users[userData.id];
       user.isDead = 0;
