@@ -1,4 +1,3 @@
-
 // make the game private, no cheaters!
 (function () {
   var socket = io.connect('http://192.168.2.39:8080');
@@ -11,7 +10,7 @@
 
   var respawn = document.getElementById('r');
 
-  var mod, sessionId, userData, userId, t;
+  var mod, sessionId, userData, userId, respawnTimer;
   var users = {};
   var bullets = {};
   var ids = {};
@@ -19,7 +18,6 @@
   var keysDown = {};
   var scores = {};
   var timed = 0;
-
   var time = Date.now();
 
   try {
@@ -165,7 +163,7 @@
 
   function respawnSelf (e) {
 
-    if (!t) {
+    if (!respanTimer) {
 
       var user = users[userData.id];
       user.isDead = 0;
@@ -198,14 +196,14 @@
     if (!timed) {
 
       timed = 1;
-      t = 10;
+      respawnTimer = 10;
       var dt = document.getElementById('timer');
-      dt.innerHTML = t;
+      dt.innerHTML = respawnTimer;
       var timer = setInterval(function () {
 
-        dt.innerHTML = --t;
+        dt.innerHTML = --respawnTimer;
 
-        if (t === 0) {
+        if (respawnTimer === 0) {
 
           dt.innerHTML = 'Respawn';
           clearTimeout(timer);
@@ -255,7 +253,7 @@
 
     if (userData.isDead) {
 
-      if (!t && 32 in keysDown) respawnSelf();
+      if (!respawnTimer && 32 in keysDown) respawnSelf();
       return;
     }
 
@@ -515,7 +513,7 @@
   patternImg.onload = function () {
     pattern = ctx.createPattern(patternImg, 'repeat');
   };
-  patternImg.src = 'images/grass3.jpg';
+  patternImg.src = 'images/grass-tile.png';
 
   var monsterImage = new Img();
   monsterImage.src = 'images/monster-right.png';
@@ -590,14 +588,8 @@
     ctx.beginPath();
     ctx.fillStyle = 'white';
 
-
-    if (userData.id === player.id) {
-
-      ctx.fillText("You", player.x + 12, player.y + 65);
-    }
-    else {
-      ctx.fillText(player.name, player.x + 12, player.y + 65);
-    }
+    var name = userData.id === player.id ? "You": player.name;
+    ctx.fillText(name, player.x + 12, player.y + 65);
 
     img = rightImage;
 
