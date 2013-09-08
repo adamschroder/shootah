@@ -18,6 +18,18 @@ var users = {};
 var bullets = {};
 var scoreBoard = {};
 
+var deathMessages = [
+  'YOU WERE EATEN ALIVE',
+  'YOUR FAMILY MOURNS YOUR DEATH',
+  'NOOB',
+  'WELCOME TO THE AFTERLIFE',
+  'OGRES FIND YOU DELICIOUS',
+  'YOU BRING DISHONOR TO YOUR NAME',
+  'WINTER IS COMING...',
+  'A FAMILY OF OGRES DID NOT GO HUNGRY BECAUSE OF YOU',
+  'COMMAND + Q FOR POWERUP'
+];
+
 var rnd = Math.random;
 var floor = Math.floor;
 
@@ -182,7 +194,7 @@ function hitUser (data) {
   if (user && !user.isDead && !user.isInvincible) {
     user.health -= data.damage;
     if (user.health <= 0) {
-      io.sockets.emit('userDeath', user.id);
+      io.sockets.emit('userDeath', user.id, deathMessages[Math.floor(Math.random()*deathMessages.length)]);
       user.isDead = 1;
       updateUserCount();
     }

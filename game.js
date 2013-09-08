@@ -1,7 +1,7 @@
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.39:8080');
-  //var socket = io.connect('http://localhost:8080');
+  //var socket = io.connect('http://192.168.2.39:8080');
+  var socket = io.connect('http://localhost:8080');
 
   var doc = document;
   function getElById (id) {
@@ -23,7 +23,7 @@
   canvas.height = 600;
 
   var respawn = getElById('r');
-
+  var message = getElById('m');
   var mod, sessionId, userData, userId, respawnTime;
   var users = {};
   var bullets = {};
@@ -143,12 +143,13 @@
     }
   });
 
-  socket.on('userDeath', function (id) {
+  socket.on('userDeath', function (id, msg) {
 
     var user = users[id];
     if (user) {
       user.isDead = 1;
       if (id === userId) {
+        message.innerHTML = msg;
         respawnTimer();
         killOwnBullets();
       }
@@ -366,6 +367,7 @@
         }
         else if (userData.facing === 'left') {
           angle = 180;
+          xOffset = - 25;
         }
         else if (userData.facing === 'right') {
           angle = 0;
