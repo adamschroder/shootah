@@ -226,7 +226,11 @@
         respawn.style.display = 'block';
       }
 
-      socket.emit('hitUser', {'id': userData.id, 'damage': monster.damage});
+      socket.emit('hitUser', {
+        'id': userData.id,
+        'damage': monster.damage,
+        'fromMonster': 1
+      });
     }
   }
 
