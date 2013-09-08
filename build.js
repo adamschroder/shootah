@@ -10,8 +10,11 @@ var config = {
     ],
     
     'files': [
-      'index.html'
-
+      'index.html',
+      'images/character-sprite-reg.png',
+      'images/grass-tile.png',
+      'images/monster-left.png',
+      'images/monster-right.png'
       // todo 'images/srpite.png'
     ]
   },
