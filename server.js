@@ -87,12 +87,12 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('hitMonster', function (data) {
 
-    monsterdirector.damageMonster(data);
+    isAlive(data.shooter) && monsterdirector.damageMonster(data);
   });
 
   socket.on('hitUser', function (data) {
 
-    hitUser(data);
+    (isAlive(data.shooter) || data.fromMonster) && hitUser(data);
   });
 
   socket.on('disconnect', function (data) {
