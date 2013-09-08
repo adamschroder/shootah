@@ -1,9 +1,11 @@
 // make the game private, no cheaters!
 (function () {
-  //var socket = io.connect('http://192.168.2.39:8888');
-  var socket = io.connect('http://localhost:8080');
+  var socket = io.connect('http://192.168.2.39:8080');
+  //var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
+  var scoreBoard = document.getElementById('st'); // score table, get it?
+
   var ctx = canvas.getContext('2d');
   canvas.width = 800;
   canvas.height = 600;
@@ -141,8 +143,16 @@
     }
   });
 
+  socket.on('userNotInvincible', function (id) {
+    var user = users[id];
+    if (user) {
+      user.isInvincible = 0;
+    }
+  });
+
   socket.on('updateScore', function (_scores) {
     scores = _scores;
+    renderScores();
   });
 
   // key events
@@ -178,7 +188,7 @@
     canShoot =  true;
   }, 150);
 
-  // limit monster damage to ever half second
+  // limit monster damage to every half second
   var canTakeDamage = true;
   var damageTimer = setInterval(function () {
     canTakeDamage =  true;
@@ -207,7 +217,7 @@
 
   function checkUserCollisions () {
 
-    if (!canTakeDamage) {
+    if (!canTakeDamage || userData.isInvincible) {
       return;
     }
     else {
@@ -416,7 +426,7 @@
       }
 
       var user = collidesWithUser(b);
-      if (user) {
+      if (user && !user.isInvincible && !user.isDead) {
         user.health -= 1;
         (user.health <= 0) && (delete users[user.id]);
         socket.emit('hitUser', {
@@ -679,6 +689,35 @@
     ctx.fillRect(user.x + offset + 3, user.y + 10, 14, 10); // eyes
     ctx.fillStyle = user.pantsColor;
     ctx.fillRect(user.x -1 + offset + 2,  user.y + 35, 17, 7); // pants
+  }
+
+  function renderScores () {
+
+    var frag = document.createDocumentFragment();
+
+    var tr;
+    var td;
+    var score;
+    for (var id in scores) {
+
+      score = scores[id];
+      tr = document.createElement('tr');
+
+      td = document.createElement('td');
+      td.innerText = score.name;
+
+      tr.appendChild(td);
+
+      td = document.createElement('td');
+      td.innerText = score.score;
+
+      tr.appendChild(td);
+
+      frag.appendChild(tr);
+    }
+
+    scoreBoard.innerHTML = '';
+    scoreBoard.appendChild(frag);
   }
 
   function run () {
