@@ -123,25 +123,32 @@ monsterdirector.on('updateScore', function (user, score) {
   sendDisplayableScoreBoard();
 });
 
+var shouldSendScoreBoard = 1;
 function sendDisplayableScoreBoard () {
 
-  var displayableScoreBoard = [];
+  if (shouldSendScoreBoard) {
+    var displayableScoreBoard = [];
+    var user;
+    for (var id in scoreBoard) {
 
-  var user;
-  for (var id in scoreBoard) {
-
-    user = getUser(id);
-    if (user) {
-      displayableScoreBoard.push({
-        'score': scoreBoard[id],
-        'name': user.name,
-        'color': user.color,
-        'id': id
-      });
+      user = getUser(id);
+      if (user) {
+        displayableScoreBoard.push({
+          'score': scoreBoard[id],
+          'name': user.name,
+          'color': user.color,
+          'id': id
+        });
+      }
     }
-  }
 
-  io.sockets.emit('updateScore', displayableScoreBoard);
+    io.sockets.emit('updateScore', displayableScoreBoard);
+
+    shouldSendScoreBoard = 0;
+    setTimeout(function () {
+      shouldSendScoreBoard = 1;
+    }, 1000);
+  }
 }
 
 function getUser (userId) {
