@@ -1,7 +1,7 @@
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.39:8080');
-  //var socket = io.connect('http://localhost:8080');
+  //var socket = io.connect('http://192.168.2.39:8080');
+  var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
   var scoreBoard = document.getElementById('st'); // score table, get it?
@@ -11,7 +11,7 @@
   canvas.height = 600;
 
   var respawn = document.getElementById('r');
-
+  var message = document.getElementById('m');
   var mod, sessionId, userData, userId, respawnTime;
   var users = {};
   var bullets = {};
@@ -131,12 +131,13 @@
     }
   });
 
-  socket.on('userDeath', function (id) {
+  socket.on('userDeath', function (id, msg) {
 
     var user = users[id];
     if (user) {
       user.isDead = 1;
       if (id === userId) {
+        message.innerHTML = msg;
         respawnTimer();
         killOwnBullets();
       }
