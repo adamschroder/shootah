@@ -87,27 +87,28 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('userPickup', function (data) {
 
+    var user = getUser(data.id);
+    if (user) {
+      user.powerup = data.powerUp;
+      if (data.powerUp.type === 'health') {
 
-    var user = users[sessionIds[data.id]];
-    user.powerup = data.powerUp;
-    if (data.powerUp.type === 'health') {
-
-      user.health = 10;
+        user.health = 10;
+      }
+      io.sockets.emit('userPickup', user, data.powerUp);
     }
-
-    io.sockets.emit('userPickup', user, data.powerUp);
   });
 
   socket.on('powerUpEnd', function (data) {
 
-    var user = users[sessionIds[data.id]];
-    user.powerup = '';
+    var user = getUser(data.id);
+    user && user.powerup = '';
   });
 
   socket.on('userRespawn', function (data) {
 
-    var user = users[sessionIds[data.id]];
+    var user = getUser(data.id);
     if (user) {
+      user.isConnected = 1;
       user.isDead = 0;
       user.health = 10;
       user.isInvincible = 1;
