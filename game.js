@@ -749,7 +749,7 @@
 
     var width = canvas.width;
     var middle = Math.floor(canvas.width / 2);
-    var max = 45;
+    var max = 22;
     var angle;
 
     if (entityX === middle) {
