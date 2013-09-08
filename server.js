@@ -26,7 +26,7 @@ var deathMessages = [
   'OGRES FIND YOU DELICIOUS',
   'YOU BRING DISHONOR TO YOUR NAME',
   'WINTER IS COMING...',
-  'A FAMILY OF OGRES DID NOT GO HUNGRY BECAUSE OF YOU',
+  'THE OGRES DID NOT GO HUNGRY BECAUSE OF YOU',
   'COMMAND + Q FOR POWERUP'
 ];
 
@@ -78,7 +78,7 @@ io.sockets.on('connection', function (socket) {
         data.x && (user.x = data.x);
         data.y && (user.y = data.y);
         data.facing && (user.facing = data.facing);
-        
+
         io.sockets.emit('move', data);
         monsterdirector.updateTarget(user);
       }
@@ -90,6 +90,10 @@ io.sockets.on('connection', function (socket) {
 
     var user = users[sessionIds[data.id]];
     user.powerup = data.powerUp;
+    if (data.powerUp.type === 'health') {
+
+      user.health = 10;
+    }
 
     io.sockets.emit('userPickup', user, data.powerUp);
   });
@@ -297,9 +301,13 @@ setInterval(function () {
 
   var pwrUpChance = floor(rnd()*100);
 
-  if (pwrUpChance <= 90) {
+  if (pwrUpChance <= 40) {
 
     spawnShotgun();
+  }
+  else {
+
+    spawnHealthPack();
   }
 }, 10000);
 
@@ -308,9 +316,21 @@ function spawnShotgun () {
   io.sockets.emit('shotgunPowerUpDrop', {
     'id': getUID(),
     'type': 'shotgun',
-    'x': 200,
-    'y': 150,
+    'x': floor(rnd()*500),
+    'y': floor(rnd()*400),
     'width': 150,
+    'height': 45
+  });
+}
+
+function spawnHealthPack () {
+
+  io.sockets.emit('healthPowerUpDrop', {
+    'id': getUID(),
+    'type': 'health',
+    'x': floor(rnd()*500),
+    'y': floor(rnd()*400),
+    'width': 45,
     'height': 45
   });
 }

@@ -37,6 +37,7 @@
   var timed = 0;
   var time = Date.now();
   var shotgunAvailable = 0;
+  var healthAvailable = 0;
 
   try {
 
@@ -157,6 +158,12 @@
     shotgunAvailable = 1;
   });
 
+  socket.on('healthPowerUpDrop', function (data) {
+
+    powerUps[data.id] = data;
+    healthAvailable = 1;
+  });
+
   socket.on('userDeath', function (id, msg) {
 
     var user = users[id];
@@ -179,12 +186,12 @@
 
   socket.on('userPickup', function (usr, powerUp) {
 
-    delete powerUps[powerUp];
+    delete powerUps[powerUp.id];
     var user = users[usr.id];
-    user = usr;
     var itemTimer = 10000;
 
     shotgunAvailable = 0;
+    healthAvailable = 0;
     gunTypeTimeout = userData.powerup.type === 'shotgun' ? 200: 150;
     clearInterval(bulletTimer);
     initBulletTimer();
@@ -197,6 +204,12 @@
     if (user.id === userData.id) {
 
       userData.powerup = powerUp;
+
+      if (powerUp.type === 'health') {
+
+        user.health = 10;
+        userData.health = 10;
+      }
 
       itemRemoveTimer = setTimeout(function () {
 
@@ -671,10 +684,16 @@
 
   function renderShotgun (gunData) {
 
-    ctx.fillStyle = "white";
     var shotgun = new Img();
     shotgun.src = 'images/shotgun.png';
     ctx.drawImage(shotgun, gunData.x, gunData.y, 70, 25);
+  }
+
+  function renderHealth (hpData) {
+
+    var hp = new Img();
+    hp.src = 'images/hp.png';
+    ctx.drawImage(hp, hpData.x, hpData.y, 45, 45);
   }
 
   // DO NOT CREATE OBJECTS IN HERE!
@@ -687,7 +706,7 @@
       all.push(monsters[monster]);
     }
 
-    if (shotgunAvailable) {
+    if (shotgunAvailable || healthAvailable) {
 
       for (var powerUp in powerUps) {
 
@@ -723,6 +742,10 @@
       else if (ent.type === 'shotgun') {
 
         renderShotgun(ent);
+      }
+      else if (ent.type === 'health') {
+
+        renderHealth(ent);
       }
     }
   }
@@ -833,7 +856,7 @@
     }
 
     // render health
-    var health = users[userId].health;
+    var health = userData.health;
     ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
     var incr = (canvas.width - 10) / 10;
     var value = incr * health;
