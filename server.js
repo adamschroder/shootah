@@ -61,12 +61,12 @@ io.sockets.on('connection', function (socket) {
   socket.on('userRespawn', function (data) {
 
     var user = users[sessionIds[data.id]];
-
     if (user) {
-
       user.isDead = 0;
       user.health = 10;
+      user.isInvincible = 1;
       io.sockets.emit('join', user);
+      timeoutPlayerInvincible(user);
     }
   });
 
@@ -99,7 +99,6 @@ io.sockets.on('connection', function (socket) {
 
     var user = users[socket.id];
     user && (user.isConnected = 0);
-    // emit to sockets disconnection of user id
   });
 });
 
@@ -121,11 +120,23 @@ monsterdirector.on('updateScore', function (user, score) {
   io.sockets.emit('updateScore', scoreBoard);
 });
 
-function isAlive (userId) {
+function getUser (userId) {
 
   var sessionId = sessionIds[userId];
   var user = sessionId && users[sessionId];
+  return user;
+}
+
+function isAlive (userId) {
+
+  var user = getUser(userId);
   return user && user.isConnected && !user.isDead;
+}
+
+function isInvincible (userId) {
+
+  var user = getUser(userId);
+  return user && user.isInvincible;
 }
 
 function updateUserCount () {
@@ -137,7 +148,7 @@ function updateUserCount () {
 function hitUser (data) {
 
   var user = users[sessionIds[data.id]];
-  if (user && !user.isDead) {
+  if (user && !user.isDead && !user.isInvincible) {
     user.health -= data.damage;
     if (user.health <= 0) {
       io.sockets.emit('userDeath', user.id);
@@ -153,7 +164,6 @@ function hitUser (data) {
   }
 }
 
-
 function createUser (socket, data) {
 
   var userData = {};
@@ -164,9 +174,6 @@ function createUser (socket, data) {
 
     // remap old data
     userData = users[sessionId];
-    userData.isDead = 0;
-    userData.isConnected = 1;
-    userData.health = 10;
     userData.socketId = socket.id;
     sessionIds[data.id] = socket.id;
     userData.name = data.name;
@@ -186,20 +193,32 @@ function createUser (socket, data) {
       'height': 50,
       'speed': 200,
       'color': '#'+floor(rnd()*16777215).toString(16),
-      'health': 10,
       'eyeColor': eyeColors[floor(rnd()*eyeColors.length)],
       'pantsColor': '#'+floor(rnd()*16777215).toString(16),
-      'facing':'down',
-      'isDead': 0,
-      'isConnected': 1
+      'facing':'down'
     };
 
     sessionIds[userData.id] = socket.id;
   }
 
+  // common / resets
+  userData.health = 10;
+  userData.isDead = 0;
+  userData.isConnected = 1;
+  userData.isInvincible = 1;
+
   // keep a map of the users data
   users[userData.socketId] = userData;
+  timeoutPlayerInvincible(userData);
   return userData;
+}
+
+function timeoutPlayerInvincible (data) {
+
+  setTimeout(function () {
+    data.isInvincible = 0;
+    io.sockets.emit('userNotInvincible', data.id);
+  }, 2000);
 }
 
 function getUID () {

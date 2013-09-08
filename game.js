@@ -1,7 +1,7 @@
 
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.95:8080');
+  var socket = io.connect('http://192.168.2.39:8080');
   //var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
@@ -143,6 +143,13 @@
     }
   });
 
+  socket.on('userNotInvincible', function (id) {
+    var user = users[id];
+    if (user) {
+      user.isInvincible = 0;
+    }
+  });
+
   socket.on('updateScore', function (_scores) {
     scores = _scores;
   });
@@ -180,7 +187,7 @@
     canShoot =  true;
   }, 150);
 
-  // limit monster damage to ever half second
+  // limit monster damage to every half second
   var canTakeDamage = true;
   var damageTimer = setInterval(function () {
     canTakeDamage =  true;
@@ -209,7 +216,7 @@
 
   function checkUserCollisions () {
 
-    if (!canTakeDamage) {
+    if (!canTakeDamage || userData.isInvincible) {
       return;
     }
     else {
@@ -418,7 +425,7 @@
       }
 
       var user = collidesWithUser(b);
-      if (user) {
+      if (user && !user.isInvincible && !user.isDead) {
         user.health -= 1;
         (user.health <= 0) && (delete users[user.id]);
         socket.emit('hitUser', {
