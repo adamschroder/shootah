@@ -101,7 +101,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('powerUpEnd', function (data) {
 
     var user = getUser(data.id);
-    user && user.powerup = '';
+    user && (user.powerup = '');
   });
 
   socket.on('userRespawn', function (data) {
