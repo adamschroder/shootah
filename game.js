@@ -173,7 +173,7 @@
 
       socket.emit('userRespawn', {'id': userData.id});
       timed = 0;
-      t = 10;
+      respawnTime = 10;
       respawn.style.display = 'none';
       canvas.className = '';
     }
