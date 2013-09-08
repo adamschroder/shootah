@@ -725,10 +725,17 @@
     var tr;
     var td;
     var score;
+
+    // highest on top
+    scores.sort(function (a, b) {
+      return a.score > b.score ? -1 : a.score < b.score ? 1 : 0;
+    });
+
     for (var id in scores) {
 
       score = scores[id];
       tr = document.createElement('tr');
+      tr.style.outline = 'thin solid ' + score.color;
 
       td = document.createElement('td');
       td.innerText = score.name;
