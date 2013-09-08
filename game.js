@@ -317,10 +317,49 @@
     facing && (userData.facing = facing) && socket.emit('updateMovement', userData);
 
     // space
+    var angle = 0;
+    var xOffset = 0;
+    var yOffset = 0;
     if (32 in keysDown) {
-
       if (canShoot) {
-        var bullet = new Bullet(userData.x + (userData.height / 2), userData.y + (userData.width / 2), userData.facing, userData.id);
+        if (userData.facing === 'up') {
+          angle = 270;
+          xOffset = -10;
+          yOffset = -30;
+        }
+        else if (userData.facing === 'up-left') {
+          angle = 225;
+          xOffset = -25;
+          yOffset = -15;
+        }
+        else if (userData.facing === 'up-right') {
+          angle = 315;
+          xOffset = 10;
+          yOffset = -20;
+        }
+        else if (userData.facing === 'down') {
+          angle = 90;
+          xOffset = -10;
+          yOffset = 0;
+        }
+        else if (userData.facing === 'down-left') {
+          angle = 135;
+          xOffset = -15;
+          yOffset = 5;
+        }
+        else if (userData.facing === 'down-right') {
+          angle = 45;
+          xOffset = 5;
+          yOffset = 5;
+        }
+        else if (userData.facing === 'left') {
+          angle = 180;
+        }
+        else if (userData.facing === 'right') {
+          angle = 0;
+        }
+
+        var bullet = new Bullet(userData.x + (userData.height / 2) + xOffset, userData.y + (userData.width / 2) + yOffset, userData.facing, angle, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
         bang(bullet.x);
@@ -365,7 +404,7 @@
     return true;
   }
 
-  function Bullet (x, y, direction, owner) {
+  function Bullet (x, y, direction, angle, owner) {
 
     var b = this;
     b.owner = owner;
@@ -375,6 +414,7 @@
     b.width = 5;
     b.height = 5;
     b.direction = direction;
+    b.angle = angle;
     b.speed = 500;
   }
 
@@ -391,35 +431,10 @@
 
     var dir = b.direction;
     var spd = b.speed * mod;
-    var angle = 0;
     bv.x = b.x;
     bv.y = b.y;
-    if (dir === 'up') {
-      angle = 270;
-    }
-    else if (dir === 'up-left') {
-      angle = 225;
-    }
-    else if (dir === 'up-right') {
-      angle = 315;
-    }
-    else if (dir === 'down') {
-      angle = 90;
-    }
-    else if (dir === 'down-left') {
-      angle = 135;
-    }
-    else if (dir === 'down-right') {
-      angle = 45;
-    }
-    else if (dir === 'left') {
-      angle = 180;
-    }
-    else if (dir === 'right') {
-      angle = 0;
-    }
 
-    bv = getNextVector(bv, angle, spd);
+    bv = getNextVector(bv, b.angle, spd);
     b.x = bv.x;
     b.y = bv.y;
 
