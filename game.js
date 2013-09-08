@@ -1,7 +1,8 @@
 // make the game private, no cheaters!
 (function () {
   //var socket = io.connect('http://192.168.2.39:8080');
-  var socket = io.connect('http://localhost:8080');
+  // var socket = io.connect('http://localhost:8080');
+  var socket = io.connect('http://shootah.nodejitsu.com:80');
 
   var doc = document;
   function getElById (id) {

@@ -1,6 +1,6 @@
 {
   "name": "shootah",
-  "version": "0.0.0",
+  "version": "0.0.0-1",
   "description": "Multiplayer shoot-em-up",
   "main": "game.js",
   "dependencies": {
@@ -22,5 +22,9 @@
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/adamschroder/shootah/issues"
+  },
+  "subdomain": "shootah",
+  "engines": {
+    "node": "0.10.x"
   }
 }
