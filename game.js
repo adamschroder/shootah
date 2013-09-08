@@ -1,7 +1,7 @@
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.39:8080');
-  // var socket = io.connect('http://localhost:8080');
+  //var socket = io.connect('http://192.168.2.39:8080');
+  var socket = io.connect('http://localhost:8080');
   //var socket = io.connect('http://shootah.nodejitsu.com:80');
 
   var doc = document;
@@ -25,7 +25,8 @@
 
   var respawn = getElById('r');
   var message = getElById('m');
-  var mod, sessionId, userData, userId, respawnTime;
+  var mod, sessionId, userData, userId, respawnTime, bulletTimer, itemRemoveTimer;
+  var gunTypeTimeout = 150;
   var users = {};
   var powerUps = {};
   var bullets = {};
@@ -177,16 +178,31 @@
     delete powerUps[powerUp];
     var user = users[usr.id];
     user = usr;
+    var itemTimer = 10000;
+
     shotgunAvailable = 0;
+    gunTypeTimeout = userData.powerup.type === 'shotgun' ? 200: 150;
+    clearInterval(bulletTimer);
+    initBulletTimer();
+
+    if (user.powerup && user.powerup.type === 'shotgun') {
+
+      clearTimeout(itemRemoveTimer);
+    }
 
     if (user.id === userData.id) {
 
       userData.powerup = powerUp;
-      setTimeout(function () {
+
+      itemRemoveTimer = setTimeout(function () {
 
         userData.powerup = '';
         socket.emit('powerUpEnd', user);
-      }, 10000);
+        gunTypeTimeout = userData.powerup.type === 'shotgun' ? 500: 150;
+        clearInterval(bulletTimer);
+        initBulletTimer();
+        itemTimer = itemTimer - 1000;
+      }, itemTimer);
     }
   });
 
@@ -236,9 +252,13 @@
 
   // rate limiting
   var canShoot = true;
-  var bulletTimer = setInterval(function () {
-    canShoot =  true;
-  }, 150);
+  function initBulletTimer () {
+
+    bulletTimer = setInterval(function () {
+      canShoot = true;
+    }, gunTypeTimeout);
+  }
+  initBulletTimer();
 
   // limit monster damage to every half second
   var canTakeDamage = true;
@@ -370,6 +390,7 @@
     var xOffset = 0;
     var yOffset = 0;
     if (32 in keysDown) {
+
       if (canShoot) {
         if (userData.facing === 'up') {
           angle = 270;
@@ -636,7 +657,9 @@
   function renderShotgun (gunData) {
 
     ctx.fillStyle = "white";
-    ctx.fillRect(gunData.x, gunData.y, 70, 25);
+    var shotgun = new Img();
+    shotgun.src = 'images/shotgun.png';
+    ctx.drawImage(shotgun, gunData.x, gunData.y, 70, 25);
   }
 
   // DO NOT CREATE OBJECTS IN HERE!
