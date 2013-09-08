@@ -10,7 +10,7 @@
 
   var respawn = document.getElementById('r');
 
-  var mod, sessionId, userData, userId, t;
+  var mod, sessionId, userData, userId, respanTimer;
   var users = {};
   var bullets = {};
   var ids = {};
@@ -156,7 +156,7 @@
 
   function respawnSelf (e) {
 
-    if (!t) {
+    if (!respanTimer) {
 
       var user = users[userData.id];
       user.isDead = 0;
@@ -189,14 +189,14 @@
     if (!timed) {
 
       timed = 1;
-      t = 10;
+      respanTimer = 10;
       var dt = document.getElementById('timer');
       dt.innerHTML = t;
       var timer = setInterval(function () {
 
-        dt.innerHTML = --t;
+        dt.innerHTML = --respanTimer;
 
-        if (t === 0) {
+        if (respanTimer === 0) {
 
           dt.innerHTML = 'Respawn';
           clearTimeout(timer);
