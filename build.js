@@ -12,6 +12,7 @@ var config = {
     'files': [
       'index.html',
       'images/character-sprite-reg.png',
+      'images/grass3.jpg',
       'images/grass-tile.png',
       'images/monster-left.png',
       'images/monster-right.png'
