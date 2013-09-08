@@ -108,6 +108,10 @@
 
   socket.on('move', function (data) {
 
+    if (data.id === userData.id) {
+      return;
+    }
+
     if (data.id) {
 
       var list = {};
@@ -321,11 +325,13 @@
       return;
     }
 
+    var updateData = {'id': userData.id};
+
     // movement
+    var angle = false;
     if (checkBounds()) {
       var offset = Object.keys(keysDown).length !== 0 && userData.speed * mod;
       var movement = false;
-      var angle = false;
       if (65 in keysDown) { // left
         angle = 83 in keysDown ? 135 : 87 in keysDown ? 225 : 180;
       }
@@ -345,7 +351,9 @@
         vp = getNextVector(vp, angle, offset);
         userData.x = vp.x;
         userData.y = vp.y;
-        socket.emit('updateMovement', userData);
+
+        updateData.x = userData.x;
+        updateData.y = userData.y;
       }
     }
 
@@ -363,10 +371,17 @@
     else if (39 in keysDown) {
       facing = 'right';
     }
-    facing && (userData.facing = facing) && socket.emit('updateMovement', userData);
+    if (facing) {
+      userData.facing = facing;
+      updateData.facing = facing;
+    }
+
+    if (angle || facing) {
+      socket.emit('updateMovement', updateData);
+    }
 
     // space
-    var angle = 0;
+    angle = 0;
     var xOffset = 0;
     var yOffset = 0;
     if (32 in keysDown) {

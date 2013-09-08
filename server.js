@@ -1,4 +1,4 @@
-var io = require('socket.io').listen(80);
+var io = require('socket.io').listen(8080);
 var monsterdirector = require('./monsterdirector');
 
 io.set("origins = *");
@@ -48,7 +48,7 @@ io.sockets.on('connection', function (socket) {
     for (var player in users) {
       otherUser = users[player];
       if (otherUser.isConnected && (otherUser.id !== user.id) && !otherUser.isDead) {
-        socket.emit('join', users[player]);
+        socket.emit('join', otherUser);
       }
     }
 
@@ -58,7 +58,7 @@ io.sockets.on('connection', function (socket) {
     for (var bullet in bullets) {
       otherBullet = bullets[bullet];
       if (otherBullet.owner !== user.id && isAlive(otherBullet.owner)) {
-        socket.emit('newBullet', bullets[bullet]);
+        socket.emit('newBullet', otherBullet);
       }
     }
 
@@ -67,9 +67,22 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('updateMovement', function (data) {
 
-    io.sockets.emit('move', data);
-    users[data.socketId] = data;
-    monsterdirector.updateTarget(data);
+    if (isAlive(data.id)) {
+
+      // facing
+      // x, y
+
+      var user = getUser(data.id);
+      if (user) {
+
+        data.x && (user.x = data.x);
+        data.y && (user.y = data.y);
+        data.facing && (user.facing = data.facing);
+        
+        io.sockets.emit('move', data);
+        monsterdirector.updateTarget(user);
+      }
+    }
   });
 
   socket.on('userPickup', function (data) {
