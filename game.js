@@ -568,15 +568,8 @@
     ctx.beginPath();
     ctx.fillStyle = 'white';
 
-
-    if (userData.id === player.id) {
-
-      ctx.fillText("You", player.x + 12, player.y + 65);
-    }
-    else {
-      console.log(player.name)
-      ctx.fillText(player.name, player.x + 12, player.y + 65);
-    }
+    var name = userData.id === player.id ? "You": player.name;
+    ctx.fillText(name, player.x + 12, player.y + 65);
 
     img = rightImage;
 
