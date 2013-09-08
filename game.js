@@ -107,7 +107,7 @@
 
     if (!bullets[data.id]) {
       bullets[data.id] = data;
-      bang();
+      bang(data.x);
     }
   });
 
@@ -297,7 +297,7 @@
         var bullet = new Bullet(userData.x + (userData.height / 2), userData.y + (userData.width / 2), userData.facing, userData.id);
         bullets[bullet.id] = bullet;
         socket.emit('newBullet', bullet);
-        bang();
+        bang(bullet.x);
       }
 
       canShoot = false;
@@ -694,30 +694,69 @@
 
   // AUDIO
   // DO IT PROGRAMATICALLY LIKE A BOSS
-
   var audioContext = new webkitAudioContext();
 
-  // noise buffer for bullets
-  var bufferSize = 2 * audioContext.sampleRate,
-      noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
-      output = noiseBuffer.getChannelData(0);
-  for (var i = 0; i < bufferSize; i++) {
+  // white noise buffer for bullets, other sounds
+  function createNoiseBuffer () {
+    var bufferSize = 2 * audioContext.sampleRate,
+        noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate),
+        output = noiseBuffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
       output[i] = Math.random() * 2 - 1;
+    }
+
+    return noiseBuffer;
   }
+  var noiseBuffer = createNoiseBuffer();
 
+  // BULLETS
   // filter for bullets!
-  var filter = audioContext.createBiquadFilter();
-  filter.type = 0; // Low-pass filter. See BiquadFilterNode docs
-  filter.frequency.value = 1000;
-  filter.connect(audioContext.destination);
+  var bulletFilter = audioContext.createBiquadFilter();
+  bulletFilter.type = 0; // Low-pass filter. See BiquadFilterNode docs
+  bulletFilter.frequency.value = 900;
+  bulletFilter.connect(audioContext.destination);
 
-  function bang () {
-
+  function bang (xPos) {
     var whiteNoise = audioContext.createBufferSource();
-    whiteNoise.connect(filter);
+    var panner = audioContext.createPanner();
+    xPan(xPos, panner);
+    bulletFilter.frequency.value = 900 + Math.floor(Math.random() * 201) - 100;
+    whiteNoise.connect(panner);
+    panner.connect(bulletFilter);
+    // whiteNoise.connect(bulletFilter);
     whiteNoise.buffer = noiseBuffer;
     whiteNoise.loop = true;
+    whiteNoise.loopStart = Math.random() * (noiseBuffer.duration / 2);
     whiteNoise.start(0);
     whiteNoise.stop(audioContext.currentTime + 0.04);
+  }
+
+  // helpers, set the pan on a given panner node based on the entities x position
+  // relative to the canvas width
+  function xPan (entityX, pannerNode) {
+
+    var width = canvas.width;
+    var middle = Math.floor(canvas.width / 2);
+    var max = 45;
+    var angle;
+
+    if (entityX === middle) {
+      angle = 0;
+    }
+    else if (entityX < middle) {
+      angle = (middle - entityX) / middle * -max;
+    }
+    else if (entityX > middle) {
+      angle = (entityX - middle) / middle * max;
+    }
+
+    var xDeg = angle;
+    var zDeg = xDeg + 90;
+    if (zDeg > 90) {
+      zDeg = 180 - zDeg;
+    }
+    var x = Math.sin(xDeg * (Math.PI / 180));
+    var z = Math.sin(zDeg * (Math.PI / 180));
+    pannerNode.setPosition(x, 0, z);
   }
 })();

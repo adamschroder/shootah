@@ -32,16 +32,20 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('join', user);
 
     // send other players to this joining player
+    var otherUser;
     for (var player in users) {
-      if (users[player].id !== user.id && !users[player].isDead) {
+      otherUser = users[player];
+      if (otherUser.isConnected && (otherUser.id !== user.id) && !otherUser.isDead) {
         socket.emit('join', users[player]);
       }
     }
 
     updateUserCount();
 
+    var otherBullet;
     for (var bullet in bullets) {
-      if (bullets[bullet].owner !== user.id) {
+      otherBullet = bullets[bullet];
+      if (otherBullet.owner !== user.id && isAlive(otherBullet.owner)) {
         socket.emit('newBullet', bullets[bullet]);
       }
     }
@@ -68,8 +72,11 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('newBullet', function (bullet) {
 
-    io.sockets.emit('newBullet', bullet);
-    bullets[bullet.id] = bullet;
+    if (isAlive(bullet.owner)) {
+
+      io.sockets.emit('newBullet', bullet);
+      bullets[bullet.id] = bullet;
+    }
   });
 
   socket.on('killBullet', function (id) {
@@ -113,6 +120,13 @@ monsterdirector.on('updateScore', function (user, score) {
   console.log('SCORE', scoreBoard);
   io.sockets.emit('updateScore', scoreBoard);
 });
+
+function isAlive (userId) {
+
+  var sessionId = sessionIds[userId];
+  var user = sessionId && users[sessionId];
+  return user && user.isConnected && !user.isDead;
+}
 
 function updateUserCount () {
 
