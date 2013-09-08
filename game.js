@@ -14,6 +14,7 @@
   var message = document.getElementById('m');
   var mod, sessionId, userData, userId, respawnTime;
   var users = {};
+  var powerUps = {};
   var bullets = {};
   var ids = {};
   var monsters = {};
@@ -21,6 +22,7 @@
   var scores = {};
   var timed = 0;
   var time = Date.now();
+  var shotgunAvailable = 0;
 
   try {
 
@@ -131,6 +133,12 @@
     }
   });
 
+  socket.on('shotgunPowerUpDrop', function (data) {
+
+    powerUps[data.id] = data;
+    shotgunAvailable = 1;
+  });
+
   socket.on('userDeath', function (id, msg) {
 
     var user = users[id];
@@ -148,6 +156,24 @@
     var user = users[id];
     if (user) {
       user.isInvincible = 0;
+    }
+  });
+
+  socket.on('userPickup', function (usr, powerUp) {
+
+    delete powerUps[powerUp];
+    var user = users[usr.id];
+    user = usr;
+    shotgunAvailable = 0;
+
+    if (user.id === userData.id) {
+
+      userData.powerup = powerUp;
+      setTimeout(function () {
+
+        userData.powerup = '';
+        socket.emit('powerUpEnd', user);
+      }, 10000);
     }
   });
 
@@ -251,6 +277,15 @@
         'id': userData.id,
         'damage': monster.damage,
         'fromMonster': 1
+      });
+    }
+
+    var powerUp = collidesWithPowerUp(userData);
+    if (powerUp) {
+
+      socket.emit('userPickup', {
+        'id': userData.id,
+        'powerUp': powerUp
       });
     }
   }
@@ -361,14 +396,25 @@
           angle = 0;
         }
 
-        var bullet = new Bullet(userData.x + (userData.height / 2) + xOffset, userData.y + (userData.width / 2) + yOffset, userData.facing, angle, userData.id);
-        bullets[bullet.id] = bullet;
-        socket.emit('newBullet', bullet);
-        bang(bullet.x);
+        if (userData.powerup && userData.powerup.type === 'shotgun') {
+
+          createBullet(xOffset, yOffset, angle-15);
+          createBullet(xOffset, yOffset, angle+15);
+        }
+
+        createBullet(xOffset, yOffset, angle);
       }
 
       canShoot = false;
     }
+  }
+
+  function createBullet (xOffset, yOffset, angle) {
+
+    var bullet = new Bullet(userData.x + (userData.height / 2) + xOffset, userData.y + (userData.width / 2) + yOffset, userData.facing, angle, userData.id);
+    bullets[bullet.id] = bullet;
+    socket.emit('newBullet', bullet);
+    bang(bullet.x);
   }
 
   function getUID () {
@@ -530,6 +576,22 @@
     return false;
   }
 
+  function collidesWithPowerUp (obj) {
+
+    var thisPowerup;
+    var collide;
+
+    for (var powerUp in powerUps) {
+
+      thisPowerup = powerUps[powerUp];
+      collide = doBoxesIntersect(obj, thisPowerup);
+      if (collide) {
+        return thisPowerup;
+      }
+    }
+    return false;
+  }
+
   function isOnBoard (obj) {
 
     if (obj.x > 800 || obj.y > 600 || obj.x < 0 || obj.y < 0) {
@@ -558,6 +620,12 @@
     ctx.drawImage(characterSprite, player.x, player.y, 50, 50);
   }
 
+  function renderShotgun (gunData) {
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(gunData.x, gunData.y, 70, 25);
+  }
+
   // DO NOT CREATE OBJECTS IN HERE!
   function renderEntities (ctx) {
     var all = [];
@@ -566,6 +634,14 @@
     }
     for (var monster in monsters) {
       all.push(monsters[monster]);
+    }
+
+    if (shotgunAvailable) {
+
+      for (var powerUp in powerUps) {
+
+        all.push(powerUps[powerUp]);
+      }
     }
 
     all.sort(function (a, b) {
@@ -592,6 +668,10 @@
       }
       else if (ent.type === 'monster') {
         renderMonster(ctx, ent);
+      }
+      else if (ent.type === 'shotgun') {
+
+        renderShotgun(ent);
       }
     }
   }

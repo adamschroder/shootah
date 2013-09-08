@@ -72,6 +72,21 @@ io.sockets.on('connection', function (socket) {
     monsterdirector.updateTarget(data);
   });
 
+  socket.on('userPickup', function (data) {
+
+
+    var user = users[sessionIds[data.id]];
+    user.powerup = data.powerUp;
+
+    io.sockets.emit('userPickup', user, data.powerUp);
+  });
+
+  socket.on('powerUpEnd', function (data) {
+
+    var user = users[sessionIds[data.id]];
+    user.powerup = '';
+  });
+
   socket.on('userRespawn', function (data) {
 
     var user = users[sessionIds[data.id]];
@@ -238,7 +253,8 @@ function createUser (socket, data) {
       'color': '#'+floor(rnd()*16777215).toString(16),
       'eyeColor': eyeColors[floor(rnd()*eyeColors.length)],
       'pantsColor': '#'+floor(rnd()*16777215).toString(16),
-      'facing':'down'
+      'facing':'down',
+      'powerup':''
     };
 
     sessionIds[userData.id] = socket.id;
@@ -262,6 +278,28 @@ function timeoutPlayerInvincible (data) {
     data.isInvincible = 0;
     io.sockets.emit('userNotInvincible', data.id);
   }, 2000);
+}
+
+setInterval(function () {
+
+  var pwrUpChance = floor(rnd()*100);
+
+  if (pwrUpChance <= 90) {
+
+    spawnShotgun();
+  }
+}, 10000);
+
+function spawnShotgun () {
+
+  io.sockets.emit('shotgunPowerUpDrop', {
+    'id': getUID(),
+    'type': 'shotgun',
+    'x': 200,
+    'y': 150,
+    'width': 150,
+    'height': 45
+  });
 }
 
 function getUID () {
