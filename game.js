@@ -166,7 +166,7 @@
 
   function respawnSelf (e) {
 
-    if (!respanTimer) {
+    if (!respawnTimer) {
 
       var user = users[userData.id];
       user.isDead = 0;
@@ -201,7 +201,7 @@
       timed = 1;
       respawnTime = 10;
       var dt = document.getElementById('timer');
-      dt.innerHTML = respawnTimer;
+      dt.innerHTML = respawnTime;
       var timer = setInterval(function () {
 
         dt.innerHTML = --respawnTime;
