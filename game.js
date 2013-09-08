@@ -12,7 +12,7 @@
 
   var respawn = document.getElementById('r');
 
-  var mod, sessionId, userData, userId, respawnTimer;
+  var mod, sessionId, userData, userId, respawnTime;
   var users = {};
   var bullets = {};
   var ids = {};
@@ -199,14 +199,14 @@
     if (!timed) {
 
       timed = 1;
-      respawnTimer = 10;
+      respawnTime = 10;
       var dt = document.getElementById('timer');
       dt.innerHTML = respawnTimer;
       var timer = setInterval(function () {
 
-        dt.innerHTML = --respawnTimer;
+        dt.innerHTML = --respawnTime;
 
-        if (respawnTimer === 0) {
+        if (respawnTime === 0) {
 
           dt.innerHTML = 'Respawn';
           clearTimeout(timer);
@@ -256,7 +256,7 @@
 
     if (userData.isDead) {
 
-      if (!respawnTimer && 32 in keysDown) respawnSelf();
+      if (!respawnTime && 32 in keysDown) respawnSelf();
       return;
     }
 
