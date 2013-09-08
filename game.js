@@ -157,10 +157,22 @@
 
   // key events
   window.addEventListener('keydown', function (e) {
+
+    if (userData.name && !userData.isDead) {
+
+      e.preventDefault();
+    }
+
     keysDown[e.keyCode] = true;
   });
 
   window.addEventListener('keyup', function (e) {
+
+    if (userData.name && !userData.isDead) {
+
+      e.preventDefault();
+    }
+
     delete keysDown[e.keyCode];
   });
 
