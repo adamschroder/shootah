@@ -1,7 +1,7 @@
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.39:8080');
-  //var socket = io.connect('http://localhost:8080');
+  //var socket = io.connect('http://192.168.2.39:8080');
+  var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
   var scoreBoard = document.getElementById('st'); // score table, get it?
@@ -354,6 +354,7 @@
         }
         else if (userData.facing === 'left') {
           angle = 180;
+          xOffset = - 25;
         }
         else if (userData.facing === 'right') {
           angle = 0;
