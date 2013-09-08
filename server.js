@@ -49,6 +49,8 @@ io.sockets.on('connection', function (socket) {
         socket.emit('newBullet', bullets[bullet]);
       }
     }
+
+    sendDisplayableScoreBoard();
   });
 
   socket.on('updateMovement', function (data) {
@@ -123,18 +125,19 @@ monsterdirector.on('updateScore', function (user, score) {
 
 function sendDisplayableScoreBoard () {
 
-  var displayableScoreBoard = {};
+  var displayableScoreBoard = [];
 
   var user;
   for (var id in scoreBoard) {
 
     user = getUser(id);
     if (user) {
-      displayableScoreBoard[id] = {
+      displayableScoreBoard.push({
         'score': scoreBoard[id],
         'name': user.name,
-        'color': user.color
-      };
+        'color': user.color,
+        'id': id
+      });
     }
   }
 
