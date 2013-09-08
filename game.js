@@ -1,7 +1,7 @@
 // make the game private, no cheaters!
 (function () {
-  var socket = io.connect('http://192.168.2.39:8888');
-  //var socket = io.connect('http://localhost:8080');
+  //var socket = io.connect('http://192.168.2.39:8888');
+  var socket = io.connect('http://localhost:8080');
 
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -506,17 +506,18 @@
   patternImg.onload = function () {
     pattern = ctx.createPattern(patternImg, 'repeat');
   };
-  patternImg.src = 'images/grass-tile.png';
+  patternImg.src = 'images/grass3.jpg';
 
   var monsterImage = new Img();
   monsterImage.src = 'images/monster-right.png';
 
-  var rightImage = new Img();
-  rightImage.src = 'images/blank-character-right.png';
+  var characterSprite = new Img();
+  characterSprite.src = 'images/character-sprite-reg.png';
 
-  var leftImage = new Img();
-  leftImage.src = "images/blank-character-left.png";
+  function renderPlayerFacing (ctx, player) {
 
+    ctx.drawImage(characterSprite, player.x, player.y, 50, 50);
+  }
 
   // DO NOT CREATE OBJECTS IN HERE!
   function renderEntities (ctx) {
@@ -576,54 +577,50 @@
 
     colorSprite(ctx, player);
 
-    // dis is the white line for facing
-    ctx.strokeStyle = 'white';
     ctx.beginPath();
     ctx.fillStyle = 'white';
+    img = characterSprite;
 
     var name = userData.id === player.id ? "You": player.name;
     ctx.fillText(name, player.x + 12, player.y + 65);
-
-    img = rightImage;
+    var offsetFacing = 0;
 
     switch (player.facing) {
       case 'up':
-        ctx.moveTo(player.x, player.y - 5);
-        ctx.lineTo(player.x + 50, player.y - 5);
       break;
       case 'up-left':
-        ctx.moveTo(player.x - 25, player.y + 20);
-        ctx.lineTo(player.x + 20, player.y - 25);
+        offsetFacing = 52;
       break;
       case 'down':
-        ctx.moveTo(player.x , player.y + 55);
-        ctx.lineTo(player.x + 50, player.y + 55);
+        offsetFacing = 358;
       break;
       case 'down-left':
-        ctx.moveTo(player.x - 30, player.y + 35);
-        ctx.lineTo(player.x + 25, player.y + 70);
+        offsetFacing = 307;
       break;
       case 'left':
-        ctx.moveTo(player.x - 5, player.y);
-        ctx.lineTo(player.x - 5, player.y + 50);
-        img = leftImage;
+        offsetFacing = 205;
       break;
       case 'right':
-        ctx.moveTo(player.x + 55, player.y);
-        ctx.lineTo(player.x + 55, player.y + 50);
-        img = rightImage;
+        offsetFacing = 154;
       break;
       case 'up-right':
-        ctx.moveTo(player.x + 75, player.y + 20);
-        ctx.lineTo(player.x + 25, player.y - 25);
+        offsetFacing = 102;
       break;
       case 'down-right':
-        ctx.moveTo(player.x + 70, player.y + 25);
-        ctx.lineTo(player.x + 35, player.y + 70);
+        offsetFacing = 256;
       break;
     }
 
-    ctx.drawImage(img, player.x, player.y, 50, 50);
+    ctx.drawImage(img,
+      0,
+      offsetFacing,
+      49,
+      49,
+      player.x,
+      player.y,
+      40,
+      45
+    );
 
     ctx.fill();
     ctx.stroke();
@@ -675,14 +672,13 @@
 
   function colorSprite (ctx, user) {
 
-    var offset = user.facing === 'left' ? 19: 11;
-
+    var offset = user.facing === 'left' || user.facing === 'down-left' || user.facing === 'up-left' ? 15: user.facing === 'down' || user.facing === 'up' ? 10.5 : 5;
     ctx.fillStyle = user.color;
     ctx.fillRect(user.x + offset,  user.y + 25, 20, 10); // shirt
     ctx.fillStyle = user.eyeColor;
-    ctx.fillRect(user.x + offset + 1, user.y + 10, 18, 10); // eyes
+    ctx.fillRect(user.x + offset + 3, user.y + 10, 14, 10); // eyes
     ctx.fillStyle = user.pantsColor;
-    ctx.fillRect(user.x + offset + 2,  user.y + 35, 16, 5); // pants
+    ctx.fillRect(user.x -1 + offset + 2,  user.y + 35, 17, 7); // pants
   }
 
   function run () {
