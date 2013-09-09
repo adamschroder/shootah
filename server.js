@@ -1,4 +1,4 @@
-var io = require('socket.io').listen(80);
+var io = require('socket.io').listen(8080);
 var monsterdirector = require('./monsterdirector');
 
 io.set("origins = *");
@@ -39,6 +39,8 @@ io.sockets.on('connection', function (socket) {
 
     var user = createUser(socket, data);
     io.sockets.emit('join', user);
+    
+    monsterdirector.start();
 
     // send other players to this joining player
     var otherUser;
@@ -60,6 +62,8 @@ io.sockets.on('connection', function (socket) {
     }
 
     sendDisplayableScoreBoard();
+
+    monsterdirector.start();
   });
 
   socket.on('updateMovement', function (data) {
@@ -164,6 +168,12 @@ monsterdirector.on('updateScore', function (user, score) {
 
   sendDisplayableScoreBoard();
 });
+
+function declareWave () {
+  monsterdirector.wave && io.sockets.emit('wave', monsterdirector.wave);
+}
+
+monsterdirector.on('wave', declareWave);
 
 var shouldSendScoreBoard = 1;
 function sendDisplayableScoreBoard () {

@@ -7,14 +7,21 @@ module.exports = (function () {
   var events = require('events');
   var self = new events.EventEmitter();
 
-  var loopCount = 0;
-  var interval = 10;
-  var rate = 1;
+  self.wave = 0;
+  var interval = 1000;
+  var rate = 2;
   var monsters = {};
   var monsterIds = {};
   var maxMonsters = 50;
   var speed = 0.5;
   var userCount = 0;
+  var time = Date.now();
+  var mod;
+
+  // 0 before, 1 during, 2 after
+  var waveState;
+  var monstersInWave;
+  var killedMonstersInWave;
 
   var board = {
     'height': 600,
@@ -43,6 +50,7 @@ module.exports = (function () {
       monster.health -= data.damage;
       if (monster.health <= 0) {
         delete monsters[data.id];
+        killedMonstersInWave--;
         self.emit('killedMonster', data.id);
         self.emit('updateScore', data.shooter, 1);
       }
@@ -125,52 +133,93 @@ module.exports = (function () {
 
   function spawnMonsters () {
 
-    var amount = userCount * rate;
+    if (waveState !== 1) return;
+    
+    console.log('spawnMonsters', waveState, waveState !== 1);
+    var limit = userCount * rate * self.wave;
+    var max = Math.round(Math.random() * limit);
+    var currentCount = Object.keys(monsters).length;
     var monster;
 
-    for (var i = 0, max = amount; i < max; i++) {
+    console.log(limit, max, currentCount)
+    for (var i = 0; i < max; i++) {
 
-      if (Object.keys(monsters).length >= maxMonsters) {
-        return false;
-      }
+      // if (Object.keys(monsters).length >= maxMonsters) {
+      //   return false;
+      // }
 
-      monster = new Monster();
-      monsters[monster.id] = monster;
+    //   monster = new Monster();
+      // monsters[monster.id] = monster;
     }
 
-    self.emit('move', monsters);
+    // self.emit('move', monsters);
   }
 
   function updateUserCount (count) {
     userCount = count;
   }
 
+  function start () {
+    if (self.wave === 0) {
+      nextWave();
+      loop();
+    }
+  }
+
+  function nextWave () {
+    self.wave++;
+    waveState = 0;
+    self.emit('wave', self.wave);
+  }
+
   function loop () {
 
-    loopCount++;
-    
-    moveMonsters();
-
-    if (loopCount === 100) {
-      loopCount = 0;
-      spawnMonsters();
-
-      var getsHarder = Math.round(Math.random() * 100) === Math.round(Math.random() * 100);
-
-      if (getsHarder) {
-        rate += 1;
-      }
+    console.log('LOOP', 'state', waveState, 'wave', self.wave)
+    if (waveState === 0) {
+      waveState = 1;
+      monstersInWave = self.wave * 10;
     }
+    else if (waveState === 1 && killedMonstersInWave >= monstersInWave) {
+      waveState = 2;
+    }
+    else if (waveState === 1) {
+      spawnMonsters();
+    }
+    else if (waveState === 2) {
+      nextWave();
+    }
+    // mod = (Date.now() - time) / 1000;
+    // moveMonsters();
 
-    self.emit('move', monsters);
+    // updateWave();
+    // spawnMonsters();
+
+    // if (loopCount === 100) {
+    //   loopCount = 0;
+    //   
+
+    //   var getsHarder = Math.round(Math.random() * 100) === Math.round(Math.random() * 100);
+
+    //   if (getsHarder) {
+    //     rate += 1;
+    //   }
+    // }
+
+    Object.keys(monsters).length && self.emit('move', monsters);
 
     setTimeout(loop, interval);
   }
 
-  loop();
-
   self.updateTarget = updateTarget;
   self.damageMonster = damageMonster;
   self.updateUserCount = updateUserCount;
+
+  self.start = start;
+
   return self;
 })();
+
+// TODO:
+// - waves
+// - cache monsters and only send directions
+// - monsters should follow in packs, not all at once
