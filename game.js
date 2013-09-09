@@ -410,7 +410,7 @@
     }
 
     if (angle || facing) {
-      socket.emit('updateMovement', updateData);
+      sendMovement(updateData);
     }
 
     // space
@@ -468,6 +468,19 @@
       }
 
       canShoot = false;
+    }
+  }
+
+  var shouldSendMovement = 1;
+  // debounced to about 30fps
+  function sendMovement (movementData) {
+
+    if (shouldSendMovement) {
+      shouldSendMovement = 0;
+      socket.emit('updateMovement', movementData);
+      setTimeout(function () {
+        shouldSendMovement = 1;
+      }, 33);
     }
   }
 
