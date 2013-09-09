@@ -184,10 +184,10 @@
     }
   });
 
-  socket.on('userPickup', function (usr, powerUp) {
+  socket.on('userPickup', function (id, powerUp) {
 
     delete powerUps[powerUp.id];
-    var user = users[usr.id];
+    var user = users[id];
     var itemTimer = 10000;
 
     shotgunAvailable = 0;

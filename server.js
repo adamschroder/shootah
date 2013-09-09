@@ -91,7 +91,7 @@ io.sockets.on('connection', function (socket) {
 
         user.health = 10;
       }
-      io.sockets.emit('userPickup', user, data.powerUp);
+      io.sockets.emit('userPickup', user.id, data.powerUp);
     }
   });
 
