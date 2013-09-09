@@ -214,7 +214,7 @@
       itemRemoveTimer = setTimeout(function () {
 
         userData.powerup = '';
-        socket.emit('powerUpEnd', user);
+        socket.emit('powerUpEnd', {'id': user.id});
         gunTypeTimeout = userData.powerup.type === 'shotgun' ? 500: 150;
         clearInterval(bulletTimer);
         initBulletTimer();
