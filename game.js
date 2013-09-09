@@ -185,7 +185,7 @@
   });
 
   socket.on('wave', function (wave) {
-    alert('WAVE ' + wave);
+    console.log('WAVE ' + wave);
   });
 
   socket.on('userPickup', function (id, powerUp) {
