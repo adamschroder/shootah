@@ -4,10 +4,10 @@ var monsterdirector = require('./monsterdirector');
 io.set("origins = *");
 io.set('transports', [
   'websocket'
-, 'flashsocket'
-, 'htmlfile'
-, 'xhr-polling'
-, 'jsonp-polling'
+// , 'flashsocket'
+// , 'htmlfile'
+// , 'xhr-polling'
+// , 'jsonp-polling'
 ]);
 
 io.set('log level', 2);
@@ -34,9 +34,6 @@ var rnd = Math.random;
 var floor = Math.floor;
 
 io.sockets.on('connection', function (socket) {
-
-  var user = users[socket.id];
-  user && (user.isConnected = 1);
 
   socket.on('userJoined', function (data) {
 

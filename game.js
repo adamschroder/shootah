@@ -127,7 +127,7 @@
 
   socket.on('newBullet', function (data) {
 
-    if (!bullets[data.id]) {
+    if (!bullets[data.id] && data.owner !== userData.id) {
       bullets[data.id] = data;
       bang(data.x);
     }
