@@ -9,15 +9,18 @@ module.exports = (function () {
 
   self.wave = 0;
   var interval = 1000;
-  var rate = 2;
+  var rate = 1;
   var monsters = {};
   var monsterIds = {};
   var maxMonsters = 50;
-  var speed = 5;
+  var speed = 10;
   var userCount = 0;
   var time = Date.now();
   var mod;
   var monsterCount = 0;
+  var monsterMultiplier = 10;
+
+  var oshit = Math.round(Math.random() * 100);
 
   // 0 before, 1 during, 2 after
   var waveState;
@@ -52,7 +55,6 @@ module.exports = (function () {
       if (monster.health <= 0) {
         delete monsters[data.id];
         monsterCount--;
-        console.log('MONSTER COUNT', monsterCount)
         killedMonstersInWave++;
         self.emit('killedMonster', data.id);
         self.emit('updateScore', data.shooter, 1);
@@ -173,11 +175,16 @@ module.exports = (function () {
     self.emit('wave', self.wave);
   }
 
+  function badLuck () {
+    var rand = Math.round(Math.random() * 100);
+    if (rand === oshit) rate++;
+  }
+
   function loop () {
 
     if (waveState === 0) {
       waveState = 1;
-      monstersInWave = self.wave * 3;
+      monstersInWave = self.wave * monsterMultiplier;
       killedMonstersInWave = 0;
     }
     else if (waveState === 1 && killedMonstersInWave >= monstersInWave) {
@@ -190,6 +197,8 @@ module.exports = (function () {
     else if (waveState === 2) {
       nextWave();
     }
+
+    badLuck();
 
     setTimeout(loop, interval);
   }

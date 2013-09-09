@@ -40,8 +40,6 @@ io.sockets.on('connection', function (socket) {
     var user = createUser(socket, data);
     io.sockets.emit('join', user);
     
-    monsterdirector.start();
-
     // send other players to this joining player
     var otherUser;
     for (var player in users) {
