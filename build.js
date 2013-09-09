@@ -15,7 +15,9 @@ var config = {
       'images/grass3.jpg',
       'images/grass-tile.png',
       'images/monster-left.png',
-      'images/monster-right.png'
+      'images/monster-right.png',
+      'images/shotgun.png',
+      'images/hp.png'
       // todo 'images/srpite.png'
     ]
   },
