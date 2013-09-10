@@ -1,10 +1,10 @@
 // make the game private, no cheaters!
 (function () {
 
-  // var socket = io.connect('http://192.168.2.39:8080');
-  // var socket = io.connect('http://localhost:8080');
+  // var socket = io.connect('http://192.168.2.95:8080');
+  var socket = io.connect('http://localhost:8080');
   // var socket = io.connect('http://shootah.nodejitsu.com:80');
-  var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
+  // var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
 
   var doc = document;
   function getElById (id) {
@@ -190,38 +190,35 @@
 
     delete powerUps[powerUp.id];
     var user = users[id];
-    var itemTimer = 10000;
 
     shotgunAvailable = 0;
     healthAvailable = 0;
-    gunTypeTimeout = userData.powerup.type === 'shotgun' ? 200: 150;
-    clearInterval(bulletTimer);
-    initBulletTimer();
-
-    if (user.powerup && user.powerup.type === 'shotgun') {
-
-      clearTimeout(itemRemoveTimer);
-    }
 
     if (user.id === userData.id) {
 
-      userData.powerup = powerUp;
+      user.powerup = powerUp;
 
       if (powerUp.type === 'health') {
-
+      
         user.health = 10;
-        userData.health = 10;
       }
+      else if (user.powerup && user.powerup.type === 'shotgun') {
 
-      itemRemoveTimer = setTimeout(function () {
+        var itemTimer = 10000;
 
-        userData.powerup = '';
-        socket.emit('powerUpEnd', {'id': user.id});
-        gunTypeTimeout = userData.powerup.type === 'shotgun' ? 500: 150;
-        clearInterval(bulletTimer);
+        gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
         initBulletTimer();
-        itemTimer = itemTimer - 1000;
-      }, itemTimer);
+
+        clearTimeout(itemRemoveTimer);
+        itemRemoveTimer = setTimeout(function () {
+
+          user.powerup = '';
+          socket.emit('powerUpEnd', {'id': user.id});
+          gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
+          initBulletTimer();
+          itemTimer = itemTimer - 1000;
+        }, itemTimer);
+      }
     }
   });
 
@@ -270,11 +267,12 @@
   // methods
 
   // rate limiting
-  var canShoot = true;
+  var canShoot = 1;
   function initBulletTimer () {
 
+    bulletTimer && clearInterval(bulletTimer);
     bulletTimer = setInterval(function () {
-      canShoot = true;
+      canShoot = 1;
     }, gunTypeTimeout);
   }
   initBulletTimer();

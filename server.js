@@ -3,9 +3,13 @@ var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
 console.log(host, port);
 
-var http = require("http").createServer();
-var io = require("socket.io").listen(http);
-http.listen(port, host);
+// for deploy on openshift:
+// var http = require("http").createServer();
+// var io = require("socket.io").listen(http);
+// http.listen(port, host);
+
+// for no proxy
+var io = require('socket.io').listen(port);
 
 var monsterdirector = require('./monsterdirector');
 
