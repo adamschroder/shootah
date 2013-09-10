@@ -2,9 +2,9 @@
 (function () {
 
   // var socket = io.connect('http://192.168.2.95:8080');
-  var socket = io.connect('http://localhost:8080');
+  // var socket = io.connect('http://localhost:8080');
   // var socket = io.connect('http://shootah.nodejitsu.com:80');
-  // var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
+  var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
 
   var doc = document;
   function getElById (id) {
