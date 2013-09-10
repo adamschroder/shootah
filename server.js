@@ -13,15 +13,9 @@ var io = require('socket.io').listen(port);
 
 var monsterdirector = require('./monsterdirector');
 
+// CORS, websockets only, less noise in the logs
 io.set("origins = *");
-io.set('transports', [
-  'websocket'
-// , 'flashsocket'
-// , 'htmlfile'
-// , 'xhr-polling'
-// , 'jsonp-polling'
-]);
-
+io.set('transports', ['websocket']);
 io.set('log level', 2);
 
 var userIds = {};
@@ -50,6 +44,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('userJoined', function (data) {
 
     var user = createUser(socket, data);
+    // send to all sockets!
     io.sockets.emit('join', user);
     
     // send other players to this joining player
@@ -90,7 +85,7 @@ io.sockets.on('connection', function (socket) {
         data.y && (user.y = data.y);
         data.facing && (user.facing = data.facing);
 
-        io.sockets.emit('move', data);
+        socket.broadcast.emit('move', data);
         monsterdirector.updateTarget(user);
       }
     }
@@ -102,7 +97,6 @@ io.sockets.on('connection', function (socket) {
     if (user) {
       user.powerup = data.powerUp;
       if (data.powerUp.type === 'health') {
-
         user.health = 10;
       }
       io.sockets.emit('userPickup', user.id, data.powerUp);
@@ -132,14 +126,14 @@ io.sockets.on('connection', function (socket) {
 
     if (isAlive(bullet.owner)) {
 
-      io.sockets.emit('newBullet', bullet);
+      socket.broadcast.emit('newBullet', bullet);
       bullets[bullet.id] = bullet;
     }
   });
 
   socket.on('killBullet', function (id) {
 
-    io.sockets.emit('killBullet', id);
+    socket.broadcast.emit('killBullet', id);
     bullets[id] && (delete bullets[id]);
   });
 
