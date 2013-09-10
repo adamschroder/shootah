@@ -194,20 +194,21 @@
     shotgunAvailable = 0;
     healthAvailable = 0;
 
+    if (powerUp.type === 'health') {
+      user.health = 10;
+    }
+
     if (user.id === userData.id) {
 
       user.powerup = powerUp;
+      gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
+      initBulletTimer();
 
-      if (powerUp.type === 'health') {
-      
-        user.health = 10;
-      }
-      else if (user.powerup && user.powerup.type === 'shotgun') {
+      if (user.powerup && user.powerup.type === 'shotgun') {
 
         var itemTimer = 10000;
 
         gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
-        initBulletTimer();
 
         clearTimeout(itemRemoveTimer);
         itemRemoveTimer = setTimeout(function () {
@@ -655,12 +656,14 @@
 
     var thisPowerup;
     var collide;
+    var allowed;
 
     for (var powerUp in powerUps) {
 
       thisPowerup = powerUps[powerUp];
       collide = doBoxesIntersect(obj, thisPowerup);
-      if (collide) {
+      allowed = thisPowerup.type === 'shotgun' ? shotgunAvailable : healthAvailable;
+      if (collide && allowed) {
         return thisPowerup;
       }
     }
