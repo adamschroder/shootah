@@ -192,38 +192,36 @@
 
     delete powerUps[powerUp.id];
     var user = users[id];
-    var itemTimer = 10000;
 
     shotgunAvailable = 0;
     healthAvailable = 0;
-    gunTypeTimeout = userData.powerup.type === 'shotgun' ? 200: 150;
-    clearInterval(bulletTimer);
-    initBulletTimer();
 
-    if (user.powerup && user.powerup.type === 'shotgun') {
-
-      clearTimeout(itemRemoveTimer);
+    if (powerUp.type === 'health') {
+      user.health = 10;
     }
 
     if (user.id === userData.id) {
 
-      userData.powerup = powerUp;
+      user.powerup = powerUp;
+      gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
+      initBulletTimer();
 
-      if (powerUp.type === 'health') {
+      if (user.powerup && user.powerup.type === 'shotgun') {
 
-        user.health = 10;
-        userData.health = 10;
+        var itemTimer = 10000;
+
+        gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
+
+        clearTimeout(itemRemoveTimer);
+        itemRemoveTimer = setTimeout(function () {
+
+          user.powerup = '';
+          socket.emit('powerUpEnd', {'id': user.id});
+          gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
+          initBulletTimer();
+          itemTimer = itemTimer - 1000;
+        }, itemTimer);
       }
-
-      itemRemoveTimer = setTimeout(function () {
-
-        userData.powerup = '';
-        socket.emit('powerUpEnd', {'id': user.id});
-        gunTypeTimeout = userData.powerup.type === 'shotgun' ? 500: 150;
-        clearInterval(bulletTimer);
-        initBulletTimer();
-        itemTimer = itemTimer - 1000;
-      }, itemTimer);
     }
   });
 
@@ -272,11 +270,12 @@
   // methods
 
   // rate limiting
-  var canShoot = true;
+  var canShoot = 1;
   function initBulletTimer () {
 
+    bulletTimer && clearInterval(bulletTimer);
     bulletTimer = setInterval(function () {
-      canShoot = true;
+      canShoot = 1;
     }, gunTypeTimeout);
   }
   initBulletTimer();
@@ -414,7 +413,7 @@
     }
 
     if (angle || facing) {
-      socket.emit('updateMovement', updateData);
+      sendMovement(updateData);
     }
 
     // space
@@ -472,6 +471,19 @@
       }
 
       canShoot = false;
+    }
+  }
+
+  var shouldSendMovement = 1;
+  // debounced to about 30fps
+  function sendMovement (movementData) {
+
+    if (shouldSendMovement) {
+      shouldSendMovement = 0;
+      socket.emit('updateMovement', movementData);
+      setTimeout(function () {
+        shouldSendMovement = 1;
+      }, 33);
     }
   }
 
@@ -646,12 +658,14 @@
 
     var thisPowerup;
     var collide;
+    var allowed;
 
     for (var powerUp in powerUps) {
 
       thisPowerup = powerUps[powerUp];
       collide = doBoxesIntersect(obj, thisPowerup);
-      if (collide) {
+      allowed = thisPowerup.type === 'shotgun' ? shotgunAvailable : healthAvailable;
+      if (collide && allowed) {
         return thisPowerup;
       }
     }

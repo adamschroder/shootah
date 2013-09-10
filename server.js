@@ -1,4 +1,16 @@
-var io = require('socket.io').listen(8080);
+var host = process.env.OPENSHIFT_NODEJS_IP || 'localhost';
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+
+console.log(host, port);
+
+// for deploy on openshift:
+// var http = require("http").createServer();
+// var io = require("socket.io").listen(http);
+// http.listen(port, host);
+
+// for no proxy
+var io = require('socket.io').listen(port);
+
 var monsterdirector = require('./monsterdirector');
 
 io.set("origins = *");
