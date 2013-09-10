@@ -1,4 +1,12 @@
-var io = require('socket.io').listen(80);
+var host = process.env.OPENSHIFT_NODEJS_IP || 'localhost';
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+
+console.log(host, port);
+
+var http = require("http").createServer();
+var io = require("socket.io").listen(http);
+http.listen(port, host);
+
 var monsterdirector = require('./monsterdirector');
 
 io.set("origins = *");
