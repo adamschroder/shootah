@@ -169,7 +169,7 @@
   socket.on('userDeath', function (id, msg) {
 
     var user = users[id];
-    if (user) {
+    if (user && !user.isDead) {
       user.isDead = 1;
       if (id === userId) {
         message.innerHTML = msg;
