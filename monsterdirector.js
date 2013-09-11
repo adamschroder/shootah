@@ -16,7 +16,7 @@ module.exports = (function () {
   var speed = 50;
   var userCount = 0;
   var time = Date.now();
-  var mod;
+  var mod = 1;
   var monsterCount = 0;
   var monsterMultiplier = 10;
 
@@ -35,7 +35,17 @@ module.exports = (function () {
     'x': 400,
     'y': 300
   };
+  var targets = {};
   var badLuckUser;
+
+  var rm = Math.PI/180;
+  function getNextVector (v, a, m) {
+
+    v.y = v.y + (Math.sin(rm*a) * m);
+    v.x = v.x + (Math.cos(rm*a) * m);
+
+    return v;
+  }
 
   function getMonsterId () {
 
@@ -63,40 +73,76 @@ module.exports = (function () {
   }
 
   function updateTarget (data) {
+    targets[data.id] = data;
+  }
 
-    superBadLuck = Math.round(Math.random() * 100) === 1;
+  function randomTarget () {
 
-    if (superBadLuck) {
-      badLuckUser = data.id;
+    var possible = [];
+    for (var id in targets) {
+      if (!targets[id].isDead) possible.push(targets[id]);
     }
-
-    changeTarget = Math.round(Math.random() * 10);
-
-    if (superBadLuck || !badLuckUser && changeTarget === 1 || badLuckUser === data.id) {
-      target.x = data.x;
-      target.y = data.y;
-    }
+    if (possible.length === 1) return possible[0];
+    var random = Math.round(Math.random() * possible.length) - 1;
+    return possible[random];
   }
 
   function moveMonsters () {
 
-    var monster;
+    var monster, random, vector;
+    var spd = speed * mod;
+
     for (var id in monsters) {
       
       monster = monsters[id];
-      if (monster.x < target.x) {
-        monster.x += monster.speed * mod;
-      }
-      else {
-        monster.x -= monster.speed * mod;
+      random = Math.round(Math.random() * oshit);
+
+      if (!monster.target || random === oshit) {
+        monster.target = randomTarget();
       }
 
-      if (monster.y < target.y) {
-        monster.y += monster.speed * mod;
+      // if all players were dead, just keep wandering...
+      if (monster.target) {
+
+        monster.angle = (Math.atan2(monster.y - monster.target.y, monster.x - monster.target.x) * 180 / Math.PI) + 180;
+
+        vector = getNextVector(monster, monster.angle, spd);
+        monster.x = vector.x;
+        monster.y = vector.y;
+
+        self.emit('move', {
+          'id': monster.id,
+          'angle': monster.angle,
+          'x': monster.x,
+          'y': monster.y,
+          'speed': spd
+        });
       }
-      else {
-        monster.y -= monster.speed * mod;
-      }
+
+      // var p1 = {
+      //   x: monster.x,
+      //   y: monster.y
+      // };
+       
+      // var p2 = {
+      //   x: monster.target.x,
+      //   y: monster.target.y
+      // };
+       
+      
+      // if (monster.x < target.x) {
+      //   monster.x += monster.speed * mod;
+      // }
+      // else {
+      //   monster.x -= monster.speed * mod;
+      // }
+
+      // if (monster.y < target.y) {
+      //   monster.y += monster.speed * mod;
+      // }
+      // else {
+      //   monster.y -= monster.speed * mod;
+      // }
     }
 
     // TODO:
@@ -156,8 +202,6 @@ module.exports = (function () {
       max = monstersInWave - monstersDeployed;
     }
 
-    console.log('DEPL', monstersDeployed, 'max', max, Object.keys(monsters).length);
-
     for (var i = 0; i < max; i++) {
       monster = new Monster();
       monsters[monster.id] = monster;
@@ -190,8 +234,6 @@ module.exports = (function () {
   function loop () {
 
     mod = (Date.now() - time) / 1000;
-
-
     if (waveState === 0) {
       waveState = 1;
       monstersInWave = self.wave * monsterMultiplier;
@@ -223,7 +265,3 @@ module.exports = (function () {
 
   return self;
 })();
-
-// TODO:
-// - cache monsters and only send directions
-// - monsters should follow in packs, not all at once

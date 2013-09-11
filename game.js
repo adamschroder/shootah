@@ -845,6 +845,12 @@
   }
 
   function renderMonster (ctx, monster) {
+
+    var speed = monster.speed * mod;
+    var vector = getNextVector(monster, monster.angle, speed);
+    monster.x = vector.x;
+    monster.y = vector.y;
+    
     ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
   }
 
