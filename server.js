@@ -8,7 +8,7 @@ console.log(host, port);
 // var io = require("socket.io").listen(http);
 // http.listen(port, host);
 
-// for no proxy
+// for no proxy (local development)
 var io = require('socket.io').listen(port);
 
 var monsterdirector = require('./monsterdirector');

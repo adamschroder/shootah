@@ -13,7 +13,7 @@ module.exports = (function () {
   var monsters = {};
   var monsterIds = {};
   var maxMonsters = 50;
-  var speed = 10;
+  var speed = 50;
   var userCount = 0;
   var time = Date.now();
   var mod;
@@ -81,26 +81,32 @@ module.exports = (function () {
   function moveMonsters () {
 
     var monster;
-
-
     for (var id in monsters) {
       
       monster = monsters[id];
-      
       if (monster.x < target.x) {
-        monster.x += speed;
+        monster.x += monster.speed * mod;
       }
       else {
-        monster.x -= speed;
+        monster.x -= monster.speed * mod;
       }
 
       if (monster.y < target.y) {
-        monster.y += speed;
+        monster.y += monster.speed * mod;
       }
       else {
-        monster.y -= speed;
+        monster.y -= monster.speed * mod;
       }
     }
+
+    // TODO:
+    // refactor to do on each call:
+    // 1. calculate next position and save as m.targetX, m.targetY (instead of assigning to m.x/y)
+    // 2. simply copy (if exists) targetX/Y to m.x/y
+    // 3. calculate and store angle between m.x/y and targetX/Y
+    // 4. send only current id, speed, x, y, and angle to clients as move event
+
+    // clients will animate inbetween frames on own by using current x,y, angle and speed (e.g. bullet animations)
 
     self.emit('move', monsters);
   }
@@ -110,6 +116,7 @@ module.exports = (function () {
     this.type = 'monster';
     this.id = getMonsterId();
     this.height = this.width = 50;
+    this.speed = speed;
     this.x = this.y = 0;
 
     var left = Math.round(Math.random() * 1);
@@ -182,6 +189,9 @@ module.exports = (function () {
 
   function loop () {
 
+    mod = (Date.now() - time) / 1000;
+
+
     if (waveState === 0) {
       waveState = 1;
       monstersInWave = self.wave * monsterMultiplier;
@@ -199,6 +209,8 @@ module.exports = (function () {
     }
 
     badLuck();
+
+    time = Date.now();
 
     setTimeout(loop, interval);
   }
