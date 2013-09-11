@@ -322,7 +322,7 @@
     if (monster) {
 
       userData.health -= monster.damage;
-      if ((userData.health <= 0) && (userData.isDead = 1)) {
+      if ((userData.health <= 0)) {
 
         canvas.className = 'd';
         respawn.style.display = 'block';
