@@ -92,7 +92,7 @@ io.sockets.on('connection', function (socket) {
   socket.on('userPickup', function (data) {
 
     var user = getUser(data.id);
-    if (user) {
+    if (user && !user.isDead) {
       user.powerup = data.powerUp;
       if (data.powerUp.type === 'health') {
         user.health = 10;

@@ -148,7 +148,7 @@
   socket.on('userDamaged', function (data) {
 
     var user = users[data.id];
-    if (user) {
+    if (user && !user.isDead) {
       user.health = data.health;
       user.hitCountdown = 100;
     }
@@ -188,8 +188,12 @@
 
   socket.on('userPickup', function (id, powerUp) {
 
-    delete powerUps[powerUp.id];
     var user = users[id];
+    if (user.isDead) {
+      return;
+    }
+
+    delete powerUps[powerUp.id];
 
     shotgunAvailable = 0;
     healthAvailable = 0;
