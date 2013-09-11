@@ -148,7 +148,7 @@
   socket.on('userDamaged', function (data) {
 
     var user = users[data.id];
-    if (user) {
+    if (user && !user.isDead) {
       user.health = data.health;
       user.hitCountdown = 100;
     }
@@ -169,7 +169,7 @@
   socket.on('userDeath', function (id, msg) {
 
     var user = users[id];
-    if (user) {
+    if (user && !user.isDead) {
       user.isDead = 1;
       if (id === userId) {
         message.innerHTML = msg;
@@ -192,8 +192,12 @@
 
   socket.on('userPickup', function (id, powerUp) {
 
-    delete powerUps[powerUp.id];
     var user = users[id];
+    if (user.isDead) {
+      return;
+    }
+
+    delete powerUps[powerUp.id];
 
     shotgunAvailable = 0;
     healthAvailable = 0;
@@ -322,7 +326,7 @@
     if (monster) {
 
       userData.health -= monster.damage;
-      if ((userData.health <= 0) && (userData.isDead = 1)) {
+      if ((userData.health <= 0)) {
 
         canvas.className = 'd';
         respawn.style.display = 'block';
