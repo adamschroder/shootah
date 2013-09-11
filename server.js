@@ -77,13 +77,13 @@ io.sockets.on('connection', function (socket) {
       // x, y
 
       var user = getUser(data.id);
-      if (user) {
+      if (user && !user.isDead) {
 
         data.x && (user.x = data.x);
         data.y && (user.y = data.y);
         data.facing && (user.facing = data.facing);
 
-        socket.broadcast.emit('move', data);
+        socket.broadcast.volatile.emit('move', data);
         monsterdirector.updateTarget(user);
       }
     }
@@ -124,7 +124,7 @@ io.sockets.on('connection', function (socket) {
 
     if (isAlive(bullet.owner)) {
 
-      socket.broadcast.emit('newBullet', bullet);
+      socket.broadcast.volatile.emit('newBullet', bullet);
       bullets[bullet.id] = bullet;
     }
   });
@@ -153,7 +153,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 monsterdirector.on('move', function (data) {
-  io.sockets.emit('move', data);
+  io.sockets.volatile.emit('move', data);
 });
 
 monsterdirector.on('killedMonster', function (id) {
@@ -190,7 +190,7 @@ function sendDisplayableScoreBoard () {
       }
     }
 
-    io.sockets.emit('updateScore', displayableScoreBoard);
+    io.sockets.volatile.emit('updateScore', displayableScoreBoard);
 
     shouldSendScoreBoard = 0;
     setTimeout(function () {
