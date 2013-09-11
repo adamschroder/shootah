@@ -3,8 +3,8 @@
 
   // var socket = io.connect('http://192.168.2.95:8080');
   // var socket = io.connect('http://localhost:8080');
-  // var socket = io.connect('http://shootah.nodejitsu.com:80');
-  var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
+  // var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
+  var socket = io.connect('http://localhost:8080');
 
   var doc = document;
   function getElById (id) {
@@ -184,6 +184,10 @@
     if (user) {
       user.isInvincible = 0;
     }
+  });
+
+  socket.on('wave', function (wave) {
+    console.log('WAVE ' + wave);
   });
 
   socket.on('userPickup', function (id, powerUp) {
@@ -841,6 +845,12 @@
   }
 
   function renderMonster (ctx, monster) {
+
+    var speed = monster.speed * mod;
+    var vector = getNextVector(monster, monster.angle, speed);
+    monster.x = vector.x;
+    monster.y = vector.y;
+    
     ctx.drawImage(monsterImage, monster.x, monster.y, monster.width, monster.height);
   }
 
