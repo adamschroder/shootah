@@ -4,12 +4,12 @@ var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 console.log(host, port);
 
 // for deploy on openshift:
-var http = require("http").createServer();
-var io = require("socket.io").listen(http);
-http.listen(port, host);
+// var http = require("http").createServer();
+// var io = require("socket.io").listen(http);
+// http.listen(port, host);
 
 // for no proxy (local development)
-// var io = require('socket.io').listen(port);
+var io = require('socket.io').listen(port);
 
 var monsterdirector = require('./monsterdirector');
 
@@ -46,7 +46,7 @@ io.sockets.on('connection', function (socket) {
     var user = createUser(socket, data);
     // send to all sockets!
     io.sockets.emit('join', user);
-
+    
     // send other players to this joining player
     var otherUser;
     for (var player in users) {
@@ -67,6 +67,8 @@ io.sockets.on('connection', function (socket) {
     }
 
     sendDisplayableScoreBoard();
+
+    monsterdirector.start();
   });
 
   socket.on('updateMovement', function (data) {
@@ -170,6 +172,12 @@ monsterdirector.on('updateScore', function (user, score) {
 
   sendDisplayableScoreBoard();
 });
+
+function declareWave () {
+  monsterdirector.wave && io.sockets.emit('wave', monsterdirector.wave);
+}
+
+monsterdirector.on('wave', declareWave);
 
 var shouldSendScoreBoard = 1;
 function sendDisplayableScoreBoard () {

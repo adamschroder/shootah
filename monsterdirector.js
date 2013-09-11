@@ -7,14 +7,25 @@ module.exports = (function () {
   var events = require('events');
   var self = new events.EventEmitter();
 
-  var loopCount = 0;
-  var interval = 10;
+  self.wave = 0;
+  var interval = 1000;
   var rate = 1;
   var monsters = {};
   var monsterIds = {};
   var maxMonsters = 50;
-  var speed = 0.5;
+  var speed = 50;
   var userCount = 0;
+  var time = Date.now();
+  var mod;
+  var monsterCount = 0;
+  var monsterMultiplier = 10;
+
+  var oshit = Math.round(Math.random() * 100);
+
+  // 0 before, 1 during, 2 after
+  var waveState;
+  var monstersInWave = 0;
+  var killedMonstersInWave = 0;
 
   var board = {
     'height': 600,
@@ -43,6 +54,8 @@ module.exports = (function () {
       monster.health -= data.damage;
       if (monster.health <= 0) {
         delete monsters[data.id];
+        monsterCount--;
+        killedMonstersInWave++;
         self.emit('killedMonster', data.id);
         self.emit('updateScore', data.shooter, 1);
       }
@@ -68,26 +81,32 @@ module.exports = (function () {
   function moveMonsters () {
 
     var monster;
-
-
     for (var id in monsters) {
       
       monster = monsters[id];
-      
       if (monster.x < target.x) {
-        monster.x += speed;
+        monster.x += monster.speed * mod;
       }
       else {
-        monster.x -= speed;
+        monster.x -= monster.speed * mod;
       }
 
       if (monster.y < target.y) {
-        monster.y += speed;
+        monster.y += monster.speed * mod;
       }
       else {
-        monster.y -= speed;
+        monster.y -= monster.speed * mod;
       }
     }
+
+    // TODO:
+    // refactor to do on each call:
+    // 1. calculate next position and save as m.targetX, m.targetY (instead of assigning to m.x/y)
+    // 2. simply copy (if exists) targetX/Y to m.x/y
+    // 3. calculate and store angle between m.x/y and targetX/Y
+    // 4. send only current id, speed, x, y, and angle to clients as move event
+
+    // clients will animate inbetween frames on own by using current x,y, angle and speed (e.g. bullet animations)
 
     self.emit('move', monsters);
   }
@@ -97,6 +116,7 @@ module.exports = (function () {
     this.type = 'monster';
     this.id = getMonsterId();
     this.height = this.width = 50;
+    this.speed = speed;
     this.x = this.y = 0;
 
     var left = Math.round(Math.random() * 1);
@@ -125,52 +145,85 @@ module.exports = (function () {
 
   function spawnMonsters () {
 
-    var amount = userCount * rate;
+    if (waveState !== 1) return;
+    
+    var limit = userCount * rate * self.wave;
+    var max = Math.round(Math.random() * limit);
+    var monstersDeployed = monsterCount + killedMonstersInWave;
     var monster;
 
-    for (var i = 0, max = amount; i < max; i++) {
-
-      if (Object.keys(monsters).length >= maxMonsters) {
-        return false;
-      }
-
-      monster = new Monster();
-      monsters[monster.id] = monster;
+    if ((monstersDeployed + max) >= monstersInWave) {
+      max = monstersInWave - monstersDeployed;
     }
 
-    self.emit('move', monsters);
+    console.log('DEPL', monstersDeployed, 'max', max, Object.keys(monsters).length);
+
+    for (var i = 0; i < max; i++) {
+      monster = new Monster();
+      monsters[monster.id] = monster;
+      monsterCount++;
+    }
   }
 
   function updateUserCount (count) {
     userCount = count;
   }
 
+  function start () {
+    if (self.wave === 0) {
+      nextWave();
+      loop();
+    }
+  }
+
+  function nextWave () {
+    self.wave++;
+    waveState = 0;
+    self.emit('wave', self.wave);
+  }
+
+  function badLuck () {
+    var rand = Math.round(Math.random() * 100);
+    if (rand === oshit) rate++;
+  }
+
   function loop () {
 
-    loopCount++;
-    
-    moveMonsters();
+    mod = (Date.now() - time) / 1000;
 
-    if (loopCount === 100) {
-      loopCount = 0;
+
+    if (waveState === 0) {
+      waveState = 1;
+      monstersInWave = self.wave * monsterMultiplier;
+      killedMonstersInWave = 0;
+    }
+    else if (waveState === 1 && killedMonstersInWave >= monstersInWave) {
+      waveState = 2;
+    }
+    else if (waveState === 1) {
       spawnMonsters();
-
-      var getsHarder = Math.round(Math.random() * 100) === Math.round(Math.random() * 100);
-
-      if (getsHarder) {
-        rate += 1;
-      }
+      moveMonsters();
+    }
+    else if (waveState === 2) {
+      nextWave();
     }
 
-    self.emit('move', monsters);
+    badLuck();
+
+    time = Date.now();
 
     setTimeout(loop, interval);
   }
 
-  loop();
-
   self.updateTarget = updateTarget;
   self.damageMonster = damageMonster;
   self.updateUserCount = updateUserCount;
+
+  self.start = start;
+
   return self;
 })();
+
+// TODO:
+// - cache monsters and only send directions
+// - monsters should follow in packs, not all at once
