@@ -229,7 +229,7 @@ function hitUser (data) {
   var user = users[sessionIds[data.id]];
   if (user && !user.isDead && !user.isInvincible) {
     user.health -= data.damage;
-    if (user.health <= 0 & !user.isDead) {
+    if (user.health <= 0) {
       io.sockets.emit('userDeath', user.id, deathMessages[Math.floor(Math.random()*deathMessages.length)]);
       user.isDead = 1;
       updateUserCount();
