@@ -588,7 +588,7 @@
       var user = collidesWithUser(b);
       if (user && !user.isInvincible && !user.isDead) {
         user.health -= 1;
-        (user.health <= 0) && (delete users[user.id]);
+        (user.health <= 0) && (users[user.id].isDead = 1);
         socket.emit('hitUser', {
           'id': user.id,
           'damage': 1,
