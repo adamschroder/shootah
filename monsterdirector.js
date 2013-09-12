@@ -7,36 +7,32 @@ module.exports = (function () {
   var events = require('events');
   var self = new events.EventEmitter();
 
-  self.wave = 0;
-  var interval = 250;
-  var rate = 1;
-  var monsters = {};
-  var monsterIds = {};
-  var maxMonsters = 50;
-  var speed = 50;
-  var userCount = 0;
-  var time = Date.now();
-  var mod = 1;
-  var monsterCount = 0;
-  var monsterMultiplier = 10;
-
-  var oshit = Math.round(Math.random() * 100);
-
-  // 0 before, 1 during, 2 after
-  var waveState;
-  var monstersInWave = 0;
-  var killedMonstersInWave = 0;
-
   var board = {
     'height': 600,
     'width': 800
   };
-  var target = {
-    'x': 400,
-    'y': 300
-  };
-  var targets = {};
-  var badLuckUser;
+
+  var time = Date.now();
+  var interval = 250;
+
+  var killedMonstersInWave, monstersInWave, waveState, oshit, monsterMultiplier, monsterCount, mod, userCount, speed, maxMonsters, monsterIds, monsters, rate, looper;
+
+  function reset () {
+    
+    self.wave = killedMonstersInWave = monstersInWave = userCount = waveState = monsterCount = 0;
+    mod = rate = 1;
+    monsterMultiplier = 10;
+    speed = 25;
+    maxMonsters = 50;
+    oshit = Math.round(Math.random() * 100);
+
+    targets = {};
+    monsterIds = {};
+    monsters = {};
+
+    badLuckUser = null;
+  }
+  reset();
 
   var rm = Math.PI/180;
   function getNextVector (v, a, m) {
@@ -189,6 +185,10 @@ module.exports = (function () {
 
   function updateUserCount (count) {
     userCount = count;
+    if (!userCount) {
+      stop();
+      reset();
+    }
   }
 
   function start () {
@@ -196,6 +196,10 @@ module.exports = (function () {
       nextWave();
       loop();
     }
+  }
+
+  function stop () {
+    clearTimeout(looper);
   }
 
   function nextWave () {
@@ -232,7 +236,7 @@ module.exports = (function () {
 
     time = Date.now();
 
-    setTimeout(loop, interval);
+    looper = setTimeout(loop, interval);
   }
 
   self.updateTarget = updateTarget;

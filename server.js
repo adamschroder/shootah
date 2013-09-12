@@ -56,8 +56,6 @@ io.sockets.on('connection', function (socket) {
       }
     }
 
-    updateUserCount();
-
     var otherBullet;
     for (var bullet in bullets) {
       otherBullet = bullets[bullet];
@@ -68,6 +66,7 @@ io.sockets.on('connection', function (socket) {
 
     sendDisplayableScoreBoard();
 
+    updateUserCount();
     monsterdirector.start();
   });
 
@@ -214,21 +213,24 @@ function getUser (userId) {
   return user;
 }
 
-function isAlive (userId) {
+function isAlive (user) {
 
-  var user = getUser(userId);
+  if (typeof user === 'number') user = getUser(user);
   return user && user.isConnected && !user.isDead;
 }
 
-function isInvincible (userId) {
+function isInvincible (user) {
 
-  var user = getUser(userId);
+  if (typeof user === 'number') user = getUser(user);
   return user && user.isInvincible;
 }
 
 function updateUserCount () {
 
-  var count = Object.keys(users).length;
+  var count = 0;
+  for (var id in users) {
+    if (isAlive(users[id])) count++;
+  }
   monsterdirector.updateUserCount(count);
 }
 
