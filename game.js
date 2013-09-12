@@ -262,6 +262,7 @@
     if (!respawnTime) {
 
       var user = users[userData.id];
+      user.health = 10;
       user.isDead = 0;
 
       socket.emit('userRespawn', {'id': userData.id});
