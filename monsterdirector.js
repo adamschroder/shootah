@@ -8,7 +8,7 @@ module.exports = (function () {
   var self = new events.EventEmitter();
 
   self.wave = 0;
-  var interval = 1000;
+  var interval = 250;
   var rate = 1;
   var monsters = {};
   var monsterIds = {};
@@ -104,11 +104,16 @@ module.exports = (function () {
       // if all players were dead, just keep wandering...
       if (monster.target) {
 
+        if (monster.nextX !== undefined) {
+          monster.x = monster.nextX;
+          monster.y = monster.nextY;
+        }
+
         monster.angle = (Math.atan2(monster.y - monster.target.y, monster.x - monster.target.x) * 180 / Math.PI) + 180;
 
         vector = getNextVector(monster, monster.angle, spd);
-        monster.x = vector.x;
-        monster.y = vector.y;
+        monster.nextX = vector.x;
+        monster.nextY = vector.y;
 
         self.emit('move', {
           'id': monster.id,
