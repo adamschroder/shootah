@@ -3,8 +3,8 @@
 
   // var socket = io.connect('http://192.168.2.95:8080');
   // var socket = io.connect('http://localhost:8080');
-  var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
-  // var socket = io.connect('http://localhost:8080');
+  // var socket = io.connect('http://shootah-octatone.rhcloud.com:8000');
+  var socket = io.connect('http://localhost:8080');
 
   var doc = document;
   function getElById (id) {
@@ -1023,4 +1023,115 @@
     var z = Math.sin(zDeg * (Math.PI / 180));
     pannerNode.setPosition(x, 0, z);
   }
+
+  // MUSIC
+  // Convert this metronome's timer clock: https://raw.github.com/cwilso/metronome/master/js/metronome.js
+  // In to a very, very basic music loop
+  var isPlaying = false;      // Are we currently playing?
+  var startTime;              // The start time of the entire sequence.
+  var current16thNote;        // What note is currently last scheduled?
+  var tempo = 132.0;          // tempo (in beats per minute)
+  var lookahead = 25.0;       // How frequently to call scheduling function 
+                              //(in milliseconds)
+  var scheduleAheadTime = 0.1;    // How far ahead to schedule audio (sec)
+                              // This is calculated from lookahead, and overlaps 
+                              // with next interval (in case the timer is late)
+  var nextNoteTime = 0.0;     // when the next note is due.
+  var noteLength = 0.03;      // length of "beep" (in seconds)
+  var timerID = 0;            // setInterval identifier.
+
+  var last16thNoteDrawn = -1; // the last "box" we drew on the screen
+  var notesInQueue = [];      // the notes that have been put into the web audio,
+                              // and may or may not have played yet. {note, time}
+
+  function nextNote() {
+      // Advance current note and time by a 16th note...
+      var secondsPerBeat = 60.0 / tempo;    // Notice this picks up the CURRENT 
+                                            // tempo value to calculate beat length.
+      nextNoteTime += 0.25 * secondsPerBeat;    // Add beat length to last beat time
+
+      current16thNote++;    // Advance the beat number, wrap to zero
+      if (current16thNote == 32) {
+          current16thNote = 0;
+      }
+  }
+
+  function scheduleNote( beatNumber, time ) {
+      
+      var length = noteLength;
+      
+      // push the note on the queue, even if we're not playing.
+      notesInQueue.push( { note: beatNumber, time: time } );
+
+      // create an oscillator
+      var osc = musicContext.createOscillator();
+      osc.type = 1;
+
+      osc.connect(musicGainNode);
+      if (beatNumber % 16 === 0) {    // beat 0 == low pitch
+          osc.frequency.value = 220.0;
+          length = 0.1;
+      }
+      else if (beatNumber % 7 === 0) {
+          osc.frequency.value = 80.0;
+          length = 0.05;
+      }
+      else if (beatNumber % 4) {    // quarter notes = medium pitch
+          osc.frequency.value = 440.0;
+      }
+      else if (beatNumber % 6) {
+          osc.frequency.value = 460.0;
+      }
+      else {                        // other 16th notes = high pitch
+          osc.frequency.value = 380.0;
+      }
+
+      osc.start( time );
+      osc.stop( time + length );
+  }
+
+  function scheduler() {
+      // while there are notes that will need to play before the next interval, 
+      // schedule them and advance the pointer.
+      while (nextNoteTime < musicContext.currentTime + scheduleAheadTime ) {
+          scheduleNote( current16thNote, nextNoteTime );
+          nextNote();
+      }
+      timerID = window.setTimeout( scheduler, lookahead );
+  }
+
+  function play() {
+      isPlaying = !isPlaying;
+
+      if (isPlaying) { // start playing
+          current16thNote = 0;
+          nextNoteTime = musicContext.currentTime;
+          scheduler();    // kick off scheduling
+          return "stop";
+      } else {
+          window.clearTimeout( timerID );
+          return "play";
+      }
+  }
+
+  function timerLoop() {
+      var currentNote = last16thNoteDrawn;
+      var currentTime = musicContext.currentTime;
+
+      while (notesInQueue.length && notesInQueue[0].time < currentTime) {
+          currentNote = notesInQueue[0].note;
+          notesInQueue.splice(0,1);   // remove note from queue
+      }
+      // set up to draw again
+      requestAnimationFrame(timerLoop);
+  }
+
+
+  musicContext = new webkitAudioContext();
+  musicGainNode = musicContext.createGain();
+  musicGainNode.connect(musicContext.destination);
+  musicGainNode.gain.value = 0.15;
+
+  timerLoop();
+  play();
 })();
