@@ -90,7 +90,7 @@ module.exports = (function () {
   function moveMonsters () {
 
     var monster, random, vector;
-    var spd = speed * mod;
+    var spd;
 
     for (var id in monsters) {
       
@@ -103,6 +103,8 @@ module.exports = (function () {
 
       // if all players were dead, just keep wandering...
       if (monster.target) {
+
+        spd = monster.speed * mod;
 
         if (monster.nextX !== undefined) {
           monster.x = monster.nextX;
@@ -123,31 +125,6 @@ module.exports = (function () {
           'speed': spd
         });
       }
-
-      // var p1 = {
-      //   x: monster.x,
-      //   y: monster.y
-      // };
-       
-      // var p2 = {
-      //   x: monster.target.x,
-      //   y: monster.target.y
-      // };
-       
-      
-      // if (monster.x < target.x) {
-      //   monster.x += monster.speed * mod;
-      // }
-      // else {
-      //   monster.x -= monster.speed * mod;
-      // }
-
-      // if (monster.y < target.y) {
-      //   monster.y += monster.speed * mod;
-      // }
-      // else {
-      //   monster.y -= monster.speed * mod;
-      // }
     }
 
     // TODO:
@@ -167,7 +144,7 @@ module.exports = (function () {
     this.type = 'monster';
     this.id = getMonsterId();
     this.height = this.width = 50;
-    this.speed = speed;
+    this.speed = speed + Math.floor(Math.random() * 100);
     this.x = this.y = 0;
 
     var left = Math.round(Math.random() * 1);
