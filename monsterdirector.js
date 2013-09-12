@@ -90,8 +90,6 @@ module.exports = (function () {
   function moveMonsters () {
 
     var monster, random, vector;
-    var spd;
-
     for (var id in monsters) {
       
       monster = monsters[id];
@@ -104,8 +102,6 @@ module.exports = (function () {
       // if all players were dead, just keep wandering...
       if (monster.target) {
 
-        spd = monster.speed * mod;
-
         if (monster.nextX !== undefined) {
           monster.x = monster.nextX;
           monster.y = monster.nextY;
@@ -113,7 +109,7 @@ module.exports = (function () {
 
         monster.angle = (Math.atan2(monster.y - monster.target.y, monster.x - monster.target.x) * 180 / Math.PI) + 180;
 
-        vector = getNextVector(monster, monster.angle, spd);
+        vector = getNextVector(monster, monster.angle, monster.speed * mod);
         monster.nextX = vector.x;
         monster.nextY = vector.y;
 
@@ -122,7 +118,7 @@ module.exports = (function () {
           'angle': monster.angle,
           'x': monster.x,
           'y': monster.y,
-          'speed': spd
+          'speed': monster.speed
         });
       }
     }
@@ -144,7 +140,7 @@ module.exports = (function () {
     this.type = 'monster';
     this.id = getMonsterId();
     this.height = this.width = 50;
-    this.speed = speed + Math.floor(Math.random() * 100);
+    this.speed = speed + Math.floor(Math.random() * 50);
     this.x = this.y = 0;
 
     var left = Math.round(Math.random() * 1);
