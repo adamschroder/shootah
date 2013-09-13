@@ -642,7 +642,7 @@
       if (thisUser.id === userId) {continue;}
       collide = doBoxesIntersect(obj, thisUser);
 
-      if (collide) {
+      if (collide && !thisUser.isDead) {
         return thisUser;
       }
     }
@@ -651,6 +651,7 @@
 
   function collidesWithMonster (obj) {
 
+    if (obj.isDead) return false;
     var thisMonster;
     var collide;
     for (var monster in monsters) {
@@ -665,6 +666,7 @@
 
   function collidesWithPowerUp (obj) {
 
+    if (obj.isDead) return false;
     var thisPowerup;
     var collide;
     var allowed;
