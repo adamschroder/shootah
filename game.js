@@ -702,11 +702,11 @@
   monsterImage.src = 'images/monster-right.png';
 
   var characterSprite = new Img();
-  characterSprite.src = 'images/character-sprite-reg.png';
+  characterSprite.src = 'images/c-sprite.png';
 
   function renderPlayerFacing (ctx, player) {
 
-    ctx.drawImage(characterSprite, player.x, player.y, 50, 50);
+    ctx.drawImage(characterSprite, player.x, player.y, 26, 23);
   }
 
   function renderShotgun (gunData) {
@@ -805,39 +805,49 @@
     var name = userId === player.id ? "You": player.name;
     ctx.fillText(name, player.x + 12, player.y + 65);
     var offsetFacing = 0;
+    
+    var offset = 26;
+    var yOffset = 0;
 
     switch (player.facing) {
       case 'up':
-      break;
+        // no offset
+        break;
       case 'up-left':
-        offsetFacing = 52;
-      break;
+        offsetFacing = offset * 1;
+        yOffset = -4;
+        break;
       case 'down':
-        offsetFacing = 358;
-      break;
+        offsetFacing = offset * 4;
+        break;
       case 'down-left':
-        offsetFacing = 307;
-      break;
+        offsetFacing = offset * 3;
+        yOffset = -4;
+        break;
       case 'left':
-        offsetFacing = 205;
-      break;
+        offsetFacing = offset * 2;
+        yOffset = -4;
+        break;
       case 'right':
-        offsetFacing = 154;
-      break;
+        offsetFacing = offset * 6;
+        yOffset = 4;
+        break;
       case 'up-right':
-        offsetFacing = 102;
-      break;
+        offsetFacing = offset * 5;
+        yOffset = 4;
+        break;
       case 'down-right':
-        offsetFacing = 256;
-      break;
+        offsetFacing = offset * 7;
+        yOffset = 2;
+        break;
     }
 
     ctx.drawImage(img,
       0,
       offsetFacing,
-      49,
-      49,
-      player.x,
+      23,
+      26,
+      player.x + yOffset,
       player.y,
       40,
       45
@@ -899,13 +909,23 @@
 
   function colorSprite (ctx, user) {
 
-    var offset = user.facing === 'left' || user.facing === 'down-left' || user.facing === 'up-left' ? 15: user.facing === 'down' || user.facing === 'up' ? 10.5 : 5;
+    var offset = user.facing === 'left' || user.facing === 'down-left' || user.facing === 'up-left' ? 15 : user.facing === 'down' || user.facing === 'up' ? 12 : 9;
+
+    // var otherOffset = 0;
+    // if (user.facing === 'left' || user.facing === 'down-left' || user.facing === 'up-left') {
+    //   // yOffset = -4;
+    // }
+    // else if (user.facing === 'down' || user.facing === 'up') {
+    //   // yOffset = 0;
+    // }
+
+
     ctx.fillStyle = user.color;
-    ctx.fillRect(user.x + offset,  user.y + 25, 20, 10); // shirt
+    ctx.fillRect(user.x + offset,  user.y + 23, 17, 15); // shirt
     ctx.fillStyle = user.eyeColor;
     ctx.fillRect(user.x + offset + 3, user.y + 10, 14, 10); // eyes
     ctx.fillStyle = user.pantsColor;
-    ctx.fillRect(user.x -1 + offset + 2,  user.y + 35, 17, 7); // pants
+    ctx.fillRect(user.x -1 + offset + 2, user.y + 35, 16, 7); // pants
   }
 
   function renderScores () {
