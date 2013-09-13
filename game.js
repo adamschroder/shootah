@@ -1029,8 +1029,9 @@
   // In to a very, very basic music loop
 
   var tracks =  [
-    [30,,,, 30,,,, 30,,,, 30,,,, 30,,,, 30,,25,, 30,,25,, 30], // bass
-    [ ,,,, 54,,,, ,,52,, 54,,56,, 57,,,, ,,,, ,,49] // lead
+    [30,,,, 30,,,, 30,,,, 30,,,,   30,,,, 30,,25,, 30,,25,, 30,,32], // bass
+    [  ,,,, 54,,,, ,,52,, 54,,56,, 57,,,, ,,,,     ,,49], // lead
+    [  ,,,, ,,,,   ,,,,   ,,,,     ,,,,   ,69,66,69,     ,69]// idk
   ];
 
   function keyToHz (key) {
@@ -1048,7 +1049,7 @@
                               // This is calculated from lookahead, and overlaps 
                               // with next interval (in case the timer is late)
   var nextNoteTime = 0.0;     // when the next note is due.
-  var noteLength = 0.03;      // length of "beep" (in seconds)
+  var noteLength = 0.04;      // length of "beep" (in seconds)
   var timerID = 0;            // setInterval identifier.
 
   var last16thNoteDrawn = -1; // the last "box" we drew on the screen
