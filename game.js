@@ -696,7 +696,7 @@
   patternImg.onload = function () {
     pattern = ctx.createPattern(patternImg, 'repeat');
   };
-  patternImg.src = 'images/grass3.jpg';
+  patternImg.src = 'images/grass-tile.png';
 
   var monsterImage = new Img();
   monsterImage.src = 'images/monster-right.png';
