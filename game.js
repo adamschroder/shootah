@@ -101,7 +101,7 @@
 
       isMonster = data.type === 'monster';
       mover = isMonster ? monsters[id] : users[id];
-      if (mover && userData && id !== userData.id) {
+      if (mover && userData && id !== userId) {
         mover.x = data.x;
         mover.y = data.y;
       }
@@ -112,7 +112,7 @@
 
   socket.on('move', function (data) {
 
-    if (data.id === userData.id) {
+    if (data.id === userId) {
       return;
     }
 
@@ -129,7 +129,7 @@
 
   socket.on('newBullet', function (data) {
 
-    if (!bullets[data.id] && data.owner !== userData.id) {
+    if (!bullets[data.id] && data.owner !== userId) {
       bullets[data.id] = data;
       bang(data.x);
     }
@@ -206,7 +206,7 @@
       user.health = 10;
     }
 
-    if (user.id === userData.id) {
+    if (user.id === userId) {
 
       user.powerup = powerUp;
       gunTypeTimeout = user.powerup.type === 'shotgun' ? 500: 150;
@@ -261,11 +261,11 @@
 
     if (!respawnTime) {
 
-      var user = users[userData.id];
+      var user = users[userId];
       user.health = 10;
       user.isDead = 0;
 
-      socket.emit('userRespawn', {'id': userData.id});
+      socket.emit('userRespawn', {'id': userId});
       timed = 0;
       respawnTime = 10;
       respawn.style.display = 'none';
@@ -316,6 +316,17 @@
 
   function checkUserCollisions () {
 
+    // powerups
+    var powerUp = collidesWithPowerUp(userData);
+    if (powerUp) {
+
+      socket.emit('userPickup', {
+        'id': userId,
+        'powerUp': powerUp
+      });
+    }
+
+    // monsters
     if (!canTakeDamage || userData.isInvincible) {
       return;
     }
@@ -334,18 +345,9 @@
       }
 
       socket.emit('hitUser', {
-        'id': userData.id,
+        'id': userId,
         'damage': monster.damage,
         'fromMonster': 1
-      });
-    }
-
-    var powerUp = collidesWithPowerUp(userData);
-    if (powerUp) {
-
-      socket.emit('userPickup', {
-        'id': userData.id,
-        'powerUp': powerUp
       });
     }
   }
@@ -368,7 +370,7 @@
       return;
     }
 
-    var updateData = {'id': userData.id};
+    var updateData = {'id': userId};
 
     // movement
     var angle = false;
@@ -496,7 +498,7 @@
 
   function createBullet (xOffset, yOffset, angle) {
 
-    var bullet = new Bullet(userData.x + (userData.height / 2) + xOffset, userData.y + (userData.width / 2) + yOffset, userData.facing, angle, userData.id);
+    var bullet = new Bullet(userData.x + (userData.height / 2) + xOffset, userData.y + (userData.width / 2) + yOffset, userData.facing, angle, userId);
     bullets[bullet.id] = bullet;
     socket.emit('newBullet', bullet);
     bang(bullet.x);
@@ -555,7 +557,7 @@
     var b;
     for (var bullet in bullets) {
       b = bullets[bullet];
-      (b.owner === userData.id) && delete bullets[bullet];
+      (b.owner === userId) && delete bullets[bullet];
     }
   }
 
@@ -574,7 +576,7 @@
     // only manage bullet collision for self
     if (b.owner === userId) {
 
-      var shooter = b.owner;
+      var shooter = userId;
 
       var isInbounds = isOnBoard(b);
 
@@ -588,7 +590,7 @@
       var user = collidesWithUser(b);
       if (user && !user.isInvincible && !user.isDead) {
         user.health -= 1;
-        (user.health <= 0) && (users[user.id].isDead = 1);
+        (user.health <= 0) && (user.isDead = 1);
         socket.emit('hitUser', {
           'id': user.id,
           'damage': 1,
@@ -785,7 +787,8 @@
 
     player.hitCountdown--;
 
-    if (!player.hitCountdown) {
+    if (!player.hitCountdown || player.hitCountdown < 0) {
+      player.hitCountdown = 0;
       player.show = 1;
     }
 
@@ -799,7 +802,7 @@
     ctx.fillStyle = 'white';
     img = characterSprite;
 
-    var name = userData.id === player.id ? "You": player.name;
+    var name = userId === player.id ? "You": player.name;
     ctx.fillText(name, player.x + 12, player.y + 65);
     var offsetFacing = 0;
 
