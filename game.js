@@ -1027,6 +1027,17 @@
   // MUSIC
   // Convert this metronome's timer clock: https://raw.github.com/cwilso/metronome/master/js/metronome.js
   // In to a very, very basic music loop
+
+  var tracks =  [
+    [30,,,, 30,,,, 30,,,, 30,,,, 30,,,, 30,,25,, 30,,25,, 30], // bass
+    [ ,,,, 54,,,, ,,52,, 54,,56,, 57,,,, ,,,, ,,49] // lead
+  ];
+
+  function keyToHz (key) {
+    var x = key - 49;
+    return 440 * Math.pow(2, x/12);
+  }
+
   var isPlaying = false;      // Are we currently playing?
   var startTime;              // The start time of the entire sequence.
   var current16thNote;        // What note is currently last scheduled?
@@ -1051,43 +1062,34 @@
       nextNoteTime += 0.25 * secondsPerBeat;    // Add beat length to last beat time
 
       current16thNote++;    // Advance the beat number, wrap to zero
-      if (current16thNote == 32) {
+      if (current16thNote == 32) { // two bar pattern
           current16thNote = 0;
       }
   }
 
   function scheduleNote( beatNumber, time ) {
       
+      var osc, keyNumb;
       var length = noteLength;
       
       // push the note on the queue, even if we're not playing.
       notesInQueue.push( { note: beatNumber, time: time } );
 
-      // create an oscillator
-      var osc = musicContext.createOscillator();
-      osc.type = 1;
+      for (var track in tracks) {
 
-      osc.connect(musicGainNode);
-      if (beatNumber % 16 === 0) {    // beat 0 == low pitch
-          osc.frequency.value = 220.0;
-          length = 0.1;
-      }
-      else if (beatNumber % 7 === 0) {
-          osc.frequency.value = 80.0;
-          length = 0.05;
-      }
-      else if (beatNumber % 4) {    // quarter notes = medium pitch
-          osc.frequency.value = 440.0;
-      }
-      else if (beatNumber % 6) {
-          osc.frequency.value = 460.0;
-      }
-      else {                        // other 16th notes = high pitch
-          osc.frequency.value = 380.0;
-      }
+        keyNumb = tracks[track][beatNumber];
+        if (keyNumb !== undefined) {
 
-      osc.start( time );
-      osc.stop( time + length );
+          // create an oscillator
+          osc = musicContext.createOscillator();
+          osc.type = 1;
+          osc.connect(musicGainNode);
+          osc.frequency.value = keyToHz(keyNumb);
+
+          osc.start(time);
+          osc.stop(time + noteLength);
+        }
+      }
   }
 
   function scheduler() {
